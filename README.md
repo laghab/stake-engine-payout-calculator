@@ -48,7 +48,7 @@ GGR      = Total Wagered × (100 − Actual RTP) / 100
 Payout   = GGR × 0.10
 ```
 
-For the full, current terms (payout cadence, balance carry-forward rules, and eligibility), always refer to Stake Engine's official documentation at [stake-engine.com/docs](https://stake-engine.com/docs) — this tool is an unofficial, illustrative estimator and is not affiliated with or endorsed by Stake or Easygo.
+For the full, current terms (payout cadence, balance carry-forward rules, and eligibility), always refer to Stake Engine's official documentation at [stake-engine.com/docs/payments](https://stake-engine.com/docs/payments) — this tool is an unofficial, illustrative estimator and is not affiliated with or endorsed by Stake or Easygo.
 
 ## Tech
 
