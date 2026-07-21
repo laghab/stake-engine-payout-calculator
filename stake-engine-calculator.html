@@ -65,6 +65,11 @@
     transition: background 0.25s ease, color 0.25s ease;
   }
 
+  .wrap {
+    width: 100%;
+    max-width: 1000px;
+  }
+
   .top-row {
     display: flex;
     align-items: flex-start;
@@ -108,11 +113,6 @@
     height: 16px;
   }
 
-  .wrap {
-    width: 100%;
-    max-width: 640px;
-  }
-
   .eyebrow {
     font-family: 'JetBrains Mono', 'SF Mono', monospace;
     font-size: 11px;
@@ -148,42 +148,6 @@
     line-height: 1.5;
   }
 
-  /* Tabs */
-  .tabs {
-    display: flex;
-    gap: 6px;
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 5px;
-    margin-bottom: 20px;
-  }
-
-  .tab-btn {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 12px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-  }
-
-  .tab-btn.active {
-    background: var(--input-bg);
-    color: var(--accent);
-    box-shadow: inset 0 0 0 1px var(--accent-dim);
-  }
-
-  .tab-btn[data-mode="ggr10"].active {
-    color: var(--debt);
-    box-shadow: inset 0 0 0 1px var(--debt-dim);
-  }
-
   .panel {
     background: var(--panel);
     border: 1px solid var(--panel-border);
@@ -210,13 +174,42 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  .rtp-value {
-    color: var(--accent);
-    font-weight: 600;
-    font-size: 15px;
+  .rtp-value-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  .rtp-value.hot { color: var(--debt); }
+  .rtp-text-input {
+    width: 50px;
+    background: var(--input-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 5px 6px;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .rtp-text-input:focus {
+    border-color: var(--accent-dim);
+  }
+
+  .rtp-text-input.hot {
+    color: var(--debt);
+  }
+
+  .rtp-pct-suffix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: -4px;
+  }
 
   input[type="range"] {
     width: 100%;
@@ -310,6 +303,16 @@
     height: 18px;
   }
 
+  .dice-btn.small {
+    width: 34px;
+    height: 34px;
+  }
+
+  .dice-btn.small svg {
+    width: 15px;
+    height: 15px;
+  }
+
   .currency-prefix {
     position: absolute;
     left: 16px;
@@ -330,6 +333,7 @@
     color: var(--text);
     font-family: 'JetBrains Mono', monospace;
     font-size: 16px;
+    font-variant-numeric: tabular-nums;
     outline: none;
     transition: border-color 0.15s;
   }
@@ -346,8 +350,8 @@
   }
 
   .preset-btn {
-    flex: 1 1 calc(33.333% - 6px);
-    min-width: 80px;
+    flex: 1 1 calc(16.666% - 7px);
+    min-width: 68px;
     background: var(--input-bg);
     border: 1px solid var(--panel-border);
     color: var(--text-dim);
@@ -371,15 +375,111 @@
     background: rgba(61,220,151,0.08);
   }
 
-  .mode-panel { display: none; }
-  .mode-panel.active { display: block; }
+  /* Side-by-side comparison grid */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: stretch;
+    position: relative;
+  }
+
+  @media (max-width: 720px) {
+    .compare-grid {
+      grid-template-columns: 1fr;
+    }
+    .rtp-link-col {
+      order: 3;
+      margin: -4px 0 4px;
+    }
+    .compare-col.ggr10 { order: 4; }
+  }
+
+  /* --- RTP link toggle (sits between the two RTP panels) --- */
+  .rtp-link-col {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 44px;
+  }
+
+  .rtp-link-btn {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+
+  .rtp-link-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .rtp-link-btn:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .rtp-link-btn.linked {
+    background: rgba(61,220,151,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  @media (max-width: 720px) {
+    .rtp-link-col {
+      padding-top: 0;
+    }
+  }
+
+  .compare-col-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .compare-col-header::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .compare-col.ggr10 .compare-col-header {
+    color: var(--debt);
+  }
+
+  .compare-col.ggr10 .compare-col-header::before {
+    background: var(--debt);
+  }
+
+  .compare-col .panel {
+    margin-bottom: 16px;
+  }
 
   /* Result panel */
   .result-panel {
     background: linear-gradient(180deg, rgba(61,220,151,0.06), rgba(61,220,151,0.02));
     border: 1px solid var(--accent-dim);
     border-radius: 14px;
-    padding: 28px;
+    padding: 24px;
   }
 
   .result-panel.has-debt {
@@ -397,10 +497,11 @@
   }
 
   .result-value {
-    font-size: 42px;
+    font-size: 34px;
     font-weight: 700;
     letter-spacing: -0.02em;
     font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
     color: var(--accent);
     margin-bottom: 4px;
   }
@@ -408,18 +509,18 @@
   .result-value.debt-active { color: var(--debt); }
 
   .result-note {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--text-dim);
     line-height: 1.5;
   }
 
   .breakdown {
-    margin-top: 24px;
-    padding-top: 20px;
+    margin-top: 18px;
+    padding-top: 16px;
     border-top: 1px solid var(--panel-border);
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   .breakdown-item {
@@ -427,7 +528,7 @@
   }
 
   .breakdown-item .k {
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--muted-text);
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -435,8 +536,9 @@
   }
 
   .breakdown-item .v {
-    font-size: 16px;
+    font-size: 14.5px;
     color: var(--text);
+    font-variant-numeric: tabular-nums;
   }
 
   .breakdown-item .v.neg { color: var(--debt); }
@@ -444,22 +546,26 @@
   .arrow-flow {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-    padding-top: 20px;
+    gap: 6px;
+    margin-top: 18px;
+    padding-top: 16px;
     border-top: 1px solid var(--panel-border);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-dim);
     flex-wrap: wrap;
+    /* Reserve enough height for two wrapped rows so panels never
+       grow/shrink vertically as the numbers change width. */
+    min-height: 62px;
   }
 
   .arrow-flow .step {
     background: var(--input-bg);
     border: 1px solid var(--panel-border);
     border-radius: 6px;
-    padding: 6px 10px;
+    padding: 5px 8px;
     color: var(--text);
+    font-variant-numeric: tabular-nums;
   }
 
   .arrow-flow .op {
@@ -497,16 +603,11 @@
       </button>
     </div>
   </div>
-  <p class="sub">Compare the 7.5% Guaranteed model against the 10% GGR revenue share.</p>
-
-  <div class="tabs">
-    <button type="button" class="tab-btn active" data-mode="fixed75">7.5% Guaranteed</button>
-    <button type="button" class="tab-btn" data-mode="ggr10">10% GGR</button>
-  </div>
+  <p class="sub">Compare the 7.5% Guaranteed model side by side with the 10% GGR revenue share.</p>
 
   <div class="panel">
     <div class="field">
-      <label>Total Wagered</label>
+      <label>Total Wagered <span style="font-size:11px; color:var(--muted-text); text-transform:none;">shared across both models</span></label>
       <div class="wager-input-row">
         <span class="currency-prefix">$</span>
         <input type="text" id="wagerInput" value="1,000,000" inputmode="numeric">
@@ -530,96 +631,169 @@
         <button type="button" class="preset-btn" data-amount="5000000">$5M</button>
       </div>
     </div>
+  </div>
 
-    <div class="mode-panel active" id="panel-fixed75">
-      <div class="field">
-        <label>Game RTP <span class="rtp-value" id="rtpDisplay75">95.0%</span></label>
-        <input type="range" id="rtpSlider75" min="90" max="96" step="0.1" value="95">
-        <div class="rtp-scale"><span>90%</span><span>92%</span><span>94%</span><span>96%</span></div>
+  <div class="compare-grid">
+
+    <!-- 7.5% Guaranteed column -->
+    <div class="compare-col fixed75">
+      <div class="compare-col-header">7.5% Guaranteed</div>
+
+      <div class="panel">
+        <div class="field">
+          <label>
+            <span>Game RTP</span>
+            <span class="rtp-value-row">
+              <input type="text" class="rtp-text-input" id="rtpText75" value="96.0" inputmode="decimal">
+              <span class="rtp-pct-suffix">%</span>
+            </span>
+          </label>
+          <input type="range" id="rtpSlider75" min="90" max="96" step="0.1" value="96">
+          <div class="rtp-scale"><span>90%</span><span>92%</span><span>94%</span><span>96%</span></div>
+          <div style="display:flex; justify-content:flex-end; margin-top:10px; visibility:hidden;">
+            <button type="button" class="dice-btn small" tabindex="-1" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="mode-panel" id="panel-ggr10">
-      <div class="field">
-        <label>Actual RTP This Period <span class="rtp-value" id="rtpDisplay10">96.0%</span></label>
-        <input type="range" id="rtpSlider10" min="75" max="120" step="0.1" value="96">
-        <div class="rtp-scale"><span>75%</span><span>96%</span><span>120%</span></div>
-        <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-          <button type="button" class="dice-btn debt-flavor" id="rtpRandomBtn" title="Simulate actual RTP for the period" aria-label="Randomize actual RTP">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="4"/>
-              <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
-              <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
-              <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
-              <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
-              <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
-            </svg>
-          </button>
+      <div class="result-panel" id="resultPanel75">
+        <div class="result-label">You receive</div>
+        <div class="result-value" id="resultValue75">$0.00</div>
+        <div class="result-note">Guaranteed, regardless of actual player outcomes.</div>
+
+        <div class="arrow-flow">
+          <span class="step" id="flowWager75">$1,000,000</span>
+          <span class="op">×</span>
+          <span class="step" id="flowEdge75">4.0% edge</span>
+          <span class="op">=</span>
+          <span class="step" id="flowGGR75">$40,000 GGR</span>
+          <span class="op">×</span>
+          <span class="step">7.5%</span>
+          <span class="op">=</span>
+          <span class="step" id="flowGross75">$3,000</span>
+        </div>
+
+        <div class="breakdown">
+          <div class="breakdown-item">
+            <div class="k">Expected GGR</div>
+            <div class="v" id="ggrOut75">$40,000.00</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="k">Gross 7.5% payment</div>
+            <div class="v" id="grossOut75">$3,000.00</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="result-panel" id="resultPanel">
-    <div class="result-label" id="resultLabel">You receive</div>
-    <div class="result-value" id="resultValue">$0.00</div>
-    <div class="result-note" id="resultNote">Guaranteed, regardless of actual player outcomes.</div>
-
-    <div class="arrow-flow">
-      <span class="step" id="flowWager">$1,000,000</span>
-      <span class="op">×</span>
-      <span class="step" id="flowEdge">5.0% edge</span>
-      <span class="op">=</span>
-      <span class="step" id="flowGGR">$50,000 GGR</span>
-      <span class="op">×</span>
-      <span class="step" id="flowRate">7.5%</span>
-      <span class="op">=</span>
-      <span class="step" id="flowGross">$3,750</span>
+    <!-- RTP link toggle -->
+    <div class="rtp-link-col">
+      <button type="button" class="rtp-link-btn" id="rtpLinkBtn" title="Link RTP values together" aria-label="Link RTP values together" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+          <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+      </button>
     </div>
 
-    <div class="breakdown">
-      <div class="breakdown-item">
-        <div class="k" id="ggrLabel">Expected GGR</div>
-        <div class="v" id="ggrOut">$50,000.00</div>
+    <!-- 10% GGR column -->
+    <div class="compare-col ggr10">
+      <div class="compare-col-header">10% GGR</div>
+
+      <div class="panel">
+        <div class="field">
+          <label>
+            <span>Actual RTP This Period</span>
+            <span class="rtp-value-row">
+              <input type="text" class="rtp-text-input" id="rtpText10" value="96.0" inputmode="decimal">
+              <span class="rtp-pct-suffix">%</span>
+            </span>
+          </label>
+          <input type="range" id="rtpSlider10" min="75" max="120" step="0.1" value="96">
+          <div class="rtp-scale"><span>75%</span><span>96%</span><span>120%</span></div>
+          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+            <button type="button" class="dice-btn debt-flavor small" id="rtpRandomBtn" title="Simulate actual RTP for the period" aria-label="Randomize actual RTP">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="4"/>
+                <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+                <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+                <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+                <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+                <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="breakdown-item">
-        <div class="k" id="grossLabel">Gross payment</div>
-        <div class="v" id="grossOut">$3,750.00</div>
+
+      <div class="result-panel" id="resultPanel10">
+        <div class="result-label" id="resultLabel10">You receive</div>
+        <div class="result-value" id="resultValue10">$0.00</div>
+        <div class="result-note" id="resultNote10">Based on this period's actual GGR.</div>
+
+        <div class="arrow-flow">
+          <span class="step" id="flowWager10">$1,000,000</span>
+          <span class="op">×</span>
+          <span class="step" id="flowEdge10">4.0% edge</span>
+          <span class="op">=</span>
+          <span class="step" id="flowGGR10">$40,000 GGR</span>
+          <span class="op">×</span>
+          <span class="step">10%</span>
+          <span class="op">=</span>
+          <span class="step" id="flowGross10">$4,000</span>
+        </div>
+
+        <div class="breakdown">
+          <div class="breakdown-item">
+            <div class="k">Actual GGR</div>
+            <div class="v" id="ggrOut10">$40,000.00</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="k">This period's 10%</div>
+            <div class="v" id="grossOut10">$4,000.00</div>
+          </div>
+        </div>
       </div>
     </div>
+
   </div>
 
   <footer>Illustrative estimate only — you never owe Stake money out of pocket</footer>
 </div>
 
 <script>
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  const modePanels = document.querySelectorAll('.mode-panel');
-
   const wagerInput = document.getElementById('wagerInput');
   const presetRow = document.getElementById('presetRow');
 
   const rtpSlider75 = document.getElementById('rtpSlider75');
-  const rtpDisplay75 = document.getElementById('rtpDisplay75');
+  const rtpText75 = document.getElementById('rtpText75');
 
   const rtpSlider10 = document.getElementById('rtpSlider10');
-  const rtpDisplay10 = document.getElementById('rtpDisplay10');
+  const rtpText10 = document.getElementById('rtpText10');
 
-  const resultPanel = document.getElementById('resultPanel');
-  const resultLabel = document.getElementById('resultLabel');
-  const resultValue = document.getElementById('resultValue');
-  const resultNote = document.getElementById('resultNote');
-  const ggrOut = document.getElementById('ggrOut');
-  const grossOut = document.getElementById('grossOut');
-  const ggrLabel = document.getElementById('ggrLabel');
-  const grossLabel = document.getElementById('grossLabel');
-  const flowWager = document.getElementById('flowWager');
-  const flowEdge = document.getElementById('flowEdge');
-  const flowGGR = document.getElementById('flowGGR');
-  const flowRate = document.getElementById('flowRate');
-  const flowGross = document.getElementById('flowGross');
+  const resultPanel10 = document.getElementById('resultPanel10');
+  const resultLabel10 = document.getElementById('resultLabel10');
+  const resultValue10 = document.getElementById('resultValue10');
+  const resultNote10 = document.getElementById('resultNote10');
+  const ggrOut10 = document.getElementById('ggrOut10');
+  const grossOut10 = document.getElementById('grossOut10');
+  const flowWager10 = document.getElementById('flowWager10');
+  const flowEdge10 = document.getElementById('flowEdge10');
+  const flowGGR10 = document.getElementById('flowGGR10');
+  const flowGross10 = document.getElementById('flowGross10');
 
-  let currentMode = 'fixed75';
+  const resultValue75 = document.getElementById('resultValue75');
+  const ggrOut75 = document.getElementById('ggrOut75');
+  const grossOut75 = document.getElementById('grossOut75');
+  const flowWager75 = document.getElementById('flowWager75');
+  const flowEdge75 = document.getElementById('flowEdge75');
+  const flowGGR75 = document.getElementById('flowGGR75');
+  const flowGross75 = document.getElementById('flowGross75');
 
   function parseNum(str) {
     const n = parseFloat(String(str).replace(/,/g, ''));
@@ -678,7 +852,6 @@
       pool.push(96 + dev);
       pool.push(96 - dev);
     }
-    // Fisher-Yates shuffle
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -695,15 +868,61 @@
     return Math.max(75, Math.min(120, value));
   }
 
-  function setMode(mode) {
-    currentMode = mode;
-    tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
-    modePanels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + mode));
-    recalc();
+  // --- RTP link/sync state ---
+  const rtpLinkBtn = document.getElementById('rtpLinkBtn');
+  let rtpLinked = false;
+
+  // Push a new RTP value into the *other* pair when linked, clamped to
+  // that pair's own slider range.
+  function propagateLinkedRtp(sourceSlider, value) {
+    if (!rtpLinked) return;
+    const isSource75 = sourceSlider === rtpSlider75;
+    const targetSlider = isSource75 ? rtpSlider10 : rtpSlider75;
+    const targetText = isSource75 ? rtpText10 : rtpText75;
+    const min = parseFloat(targetSlider.min);
+    const max = parseFloat(targetSlider.max);
+    const clamped = Math.max(min, Math.min(max, value));
+    targetSlider.value = clamped;
+    targetText.value = clamped.toFixed(1);
   }
 
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  // Keep slider <-> text input in sync for a given pair
+  function bindRtpControls(slider, text, min, max) {
+    slider.addEventListener('input', () => {
+      text.value = parseFloat(slider.value).toFixed(1);
+      propagateLinkedRtp(slider, parseFloat(slider.value));
+      recalc();
+    });
+    text.addEventListener('input', () => {
+      const v = parseFloat(text.value);
+      if (!isNaN(v)) propagateLinkedRtp(slider, v);
+      recalc();
+    });
+    text.addEventListener('blur', () => {
+      let v = parseFloat(text.value);
+      if (isNaN(v)) v = parseFloat(slider.value);
+      v = Math.max(min, Math.min(max, v));
+      text.value = v.toFixed(1);
+      slider.value = v;
+      propagateLinkedRtp(slider, v);
+      recalc();
+    });
+  }
+
+  bindRtpControls(rtpSlider75, rtpText75, 90, 96);
+  bindRtpControls(rtpSlider10, rtpText10, 75, 120);
+
+  rtpLinkBtn.addEventListener('click', () => {
+    rtpLinked = !rtpLinked;
+    rtpLinkBtn.classList.toggle('linked', rtpLinked);
+    rtpLinkBtn.setAttribute('aria-pressed', String(rtpLinked));
+    rtpLinkBtn.title = rtpLinked ? 'Unlink RTP values' : 'Link RTP values together';
+    if (rtpLinked) {
+      // On linking, sync the 10% column to whatever the 7.5% RTP
+      // currently is (clamped to the 10% slider's own range).
+      propagateLinkedRtp(rtpSlider75, parseFloat(rtpSlider75.value));
+      recalc();
+    }
   });
 
   presetRow.addEventListener('click', (e) => {
@@ -713,85 +932,78 @@
     recalc();
   });
 
+  function currentRtp75() {
+    const fromText = parseFloat(rtpText75.value);
+    return isNaN(fromText) ? parseFloat(rtpSlider75.value) : fromText;
+  }
+
+  function currentRtp10() {
+    const fromText = parseFloat(rtpText10.value);
+    return isNaN(fromText) ? parseFloat(rtpSlider10.value) : fromText;
+  }
+
   function recalcFixed75() {
-    const rtp = parseFloat(rtpSlider75.value);
+    const rtp = currentRtp75();
     const edge = 100 - rtp;
-    rtpDisplay75.textContent = rtp.toFixed(1) + '%';
 
     const wager = parseNum(wagerInput.value);
     const ggr = wager * (edge / 100);
     const gross = ggr * 0.075;
 
-    resultPanel.classList.remove('has-debt');
-    resultLabel.textContent = 'You receive';
-    resultValue.textContent = formatMoney(gross);
-    resultValue.classList.remove('debt-active');
-    resultNote.textContent = 'Guaranteed, regardless of actual player outcomes.';
+    resultValue75.textContent = formatMoney(gross);
 
-    ggrLabel.textContent = 'Expected GGR';
-    grossLabel.textContent = 'Gross 7.5% payment';
-    flowRate.textContent = '7.5%';
+    flowWager75.textContent = '$' + formatInt(wager);
+    flowEdge75.textContent = edge.toFixed(1) + '% edge';
+    flowGGR75.textContent = formatMoney(ggr) + ' GGR';
+    flowGross75.textContent = formatMoney(gross);
+    ggrOut75.textContent = formatMoney(ggr);
+    grossOut75.textContent = formatMoney(gross);
 
-    flowWager.textContent = '$' + formatInt(wager);
-    flowEdge.textContent = edge.toFixed(1) + '% edge';
-    flowGGR.textContent = formatMoney(ggr) + ' GGR';
-    flowGross.textContent = formatMoney(gross);
-    ggrOut.textContent = formatMoney(ggr);
-    ggrOut.classList.remove('neg');
-    grossOut.textContent = formatMoney(gross);
-    grossOut.classList.remove('neg');
+    return gross;
   }
 
   function recalcGGR10() {
-    const rtp = parseFloat(rtpSlider10.value);
+    const rtp = currentRtp10();
     const edge = 100 - rtp;
-    rtpDisplay10.textContent = rtp.toFixed(1) + '%';
-    rtpDisplay10.classList.toggle('hot', rtp > 100);
+    rtpText10.classList.toggle('hot', rtp > 100);
     rtpSlider10.classList.toggle('hot', rtp > 100);
 
     const wager = parseNum(wagerInput.value);
     const ggr = wager * (edge / 100);
     const periodShare = ggr * 0.10;
 
-    ggrLabel.textContent = 'Actual GGR';
-    grossLabel.textContent = 'This period\'s 10%';
-    flowRate.textContent = '10%';
-
-    flowWager.textContent = '$' + formatInt(wager);
-    flowEdge.textContent = (edge >= 0 ? edge.toFixed(1) : '−' + Math.abs(edge).toFixed(1)) + '% edge';
-    flowGGR.textContent = formatMoney(ggr) + ' GGR';
-    flowGross.textContent = formatMoney(periodShare);
-    ggrOut.textContent = formatMoney(ggr);
-    ggrOut.classList.toggle('neg', ggr < 0);
-    grossOut.textContent = formatMoney(periodShare);
-    grossOut.classList.toggle('neg', periodShare < 0);
+    flowWager10.textContent = '$' + formatInt(wager);
+    flowEdge10.textContent = (edge >= 0 ? edge.toFixed(1) : '−' + Math.abs(edge).toFixed(1)) + '% edge';
+    flowGGR10.textContent = formatMoney(ggr) + ' GGR';
+    flowGross10.textContent = formatMoney(periodShare);
+    ggrOut10.textContent = formatMoney(ggr);
+    ggrOut10.classList.toggle('neg', ggr < 0);
+    grossOut10.textContent = formatMoney(periodShare);
+    grossOut10.classList.toggle('neg', periodShare < 0);
 
     if (periodShare < 0) {
-      resultPanel.classList.add('has-debt');
-      resultLabel.textContent = 'Carried-forward debt';
-      resultValue.textContent = formatMoney(Math.abs(periodShare));
-      resultValue.classList.add('debt-active');
-      resultNote.textContent = 'Negative GGR this period. No payout — the balance carries forward, and you never owe Stake money out of pocket.';
+      resultPanel10.classList.add('has-debt');
+      resultLabel10.textContent = 'Carried-forward debt';
+      resultValue10.textContent = formatMoney(Math.abs(periodShare));
+      resultValue10.classList.add('debt-active');
+      resultNote10.textContent = 'Negative GGR this period. No payout — the balance carries forward, and you never owe Stake money out of pocket.';
     } else {
-      resultPanel.classList.remove('has-debt');
-      resultLabel.textContent = 'You receive';
-      resultValue.textContent = formatMoney(periodShare);
-      resultValue.classList.remove('debt-active');
-      resultNote.textContent = 'Based on this period\'s actual GGR.';
+      resultPanel10.classList.remove('has-debt');
+      resultLabel10.textContent = 'You receive';
+      resultValue10.textContent = formatMoney(periodShare);
+      resultValue10.classList.remove('debt-active');
+      resultNote10.textContent = 'Based on this period\'s actual GGR.';
     }
+
+    return periodShare;
   }
 
   function recalc() {
     syncPresetHighlight();
-    if (currentMode === 'fixed75') {
-      recalcFixed75();
-    } else {
-      recalcGGR10();
-    }
+    recalcFixed75();
+    recalcGGR10();
   }
 
-  rtpSlider75.addEventListener('input', recalc);
-  rtpSlider10.addEventListener('input', recalc);
   wagerInput.addEventListener('input', recalc);
   wagerInput.addEventListener('blur', () => { sanitizeInputOnBlur(wagerInput); recalc(); });
 
@@ -801,7 +1013,10 @@
   });
 
   document.getElementById('rtpRandomBtn').addEventListener('click', () => {
-    rtpSlider10.value = nextRandomRTP().toFixed(1);
+    const v = nextRandomRTP();
+    rtpSlider10.value = v.toFixed(1);
+    rtpText10.value = v.toFixed(1);
+    propagateLinkedRtp(rtpSlider10, v);
     recalc();
   });
 
@@ -825,7 +1040,6 @@
   darkModeBtn.addEventListener('click', () => setTheme('dark'));
   lightModeBtn.addEventListener('click', () => setTheme('light'));
 
-  // Default to the visitor's OS preference
   const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
   setTheme(prefersLight ? 'light' : 'dark');
 </script>
