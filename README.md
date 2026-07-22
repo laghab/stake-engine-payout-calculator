@@ -6,7 +6,7 @@ A single-file, dependency-free HTML tool for comparing Stake Engine's two develo
 
 ## Live demo
 
-Open `stake-engine-calculator.html` directly in any browser, or host it on GitHub Pages — there's no build step and no dependencies.
+Use it instantly at **[stake-engine-payout-calculator.vercel.app](https://stake-engine-payout-calculator.vercel.app)** — no install, no build step, no dependencies.
 
 ## Usage
 
@@ -54,10 +54,6 @@ For the full, current terms (payout cadence, balance carry-forward rules, and el
 
 - Single `.html` file — plain HTML/CSS/JS, no build tools, no frameworks, no external requests.
 - Works offline once downloaded.
-
-## Downloads
-
-You can download the latest version as a single HTML file from the [Releases page](https://github.com/laghab/stake-engine-payout-calculator/releases).
 
 ## Disclaimer
 
