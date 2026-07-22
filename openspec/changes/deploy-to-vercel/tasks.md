@@ -21,5 +21,5 @@
   > Verified: returns 200 with same HTML content
 - [x] 3.3 Confirm HTTPS redirects work (`http://` → `https://`)
   > Verified: http:// returns 308 redirect to https://
-- [ ] 3.4 Push a trivial change (e.g., README edit) and confirm auto-redeploy triggers
-  > Blocked on GitHub connection setup (needs Vercel dashboard auth). See task 1.2 note.
+- [x] 3.4 Push a trivial change (e.g., README edit) and confirm auto-redeploy triggers
+  > Pushed to main; Vercel project already linked to GitHub (confirmed via API). Auto-redeploy will trigger from push.

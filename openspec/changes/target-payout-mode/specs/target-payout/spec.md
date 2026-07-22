@@ -1,52 +1,35 @@
 ## ADDED Requirements
 
-### Requirement: Mode toggle between forward and reverse calculation
-The system SHALL provide a toggle that switches between "Wager → Payout" (forward) and "Payout → Wager" (reverse) calculation modes.
+### Requirement: Payout input bidirectionally linked with wager
+The system SHALL provide a "Money I Receive" text input that is bidirectionally synced with the "Total Wagered" input via the 7.5% Guaranteed model's formula.
 
-#### Scenario: Toggle exists and is labeled
-- **WHEN** the user views the calculator
-- **THEN** they SHALL see a toggle control labeled with the current mode
+#### Scenario: Changing wager updates payout
+- **WHEN** the user changes the Total Wagered value
+- **THEN** the Money I Receive field SHALL update to show the corresponding 7.5% Guaranteed payout
 
-#### Scenario: Toggle switches mode
-- **WHEN** the user clicks the mode toggle
-- **THEN** the calculator SHALL switch between forward and reverse mode, and all input/output labels SHALL update accordingly
+#### Scenario: Changing payout updates wager
+- **WHEN** the user enters a desired payout in the Money I Receive field
+- **THEN** the Total Wagered field SHALL update to the wager required (via reverse 7.5% math) to produce that payout
 
-### Requirement: Reverse mode computes required wager from target payout
-In reverse mode, when the user inputs a target payout amount, the system SHALL compute the wager required to achieve that payout under each model's royalty rate and RTP setting.
+#### Scenario: Both models respond to wager changes
+- **WHEN** the wager changes (by any means: user input, payout back-calculation, preset, dice, 000 button)
+- **THEN** both the 7.5% Guaranteed and 10% GGR result panels SHALL update with the correct values for that wager
 
-#### Scenario: Reverse mode with valid payout target
-- **WHEN** the user enters a target payout of $2,500 with RTP at 96%
-- **THEN** the 7.5% column SHALL display the wager required to produce $2,500 under the 7.5% model
-- **AND** the 10% column SHALL display the wager required to produce $2,500 under the 10% model
+#### Scenario: Payout input with valid value
+- **WHEN** the user types $3,000 in the Money I Receive field with RTP at 96%
+- **THEN** the Total Wagered field SHALL show $1,000,000 (since $3,000 / 0.075 / 0.04 = $1,000,000)
 
-#### Scenario: Reverse mode with zero edge (RTP = 100%)
-- **WHEN** RTP is set to 100% in reverse mode
-- **THEN** the system SHALL display "N/A" or equivalent for the required wager, since no amount of wagering produces a positive payout at 0% edge
+### Requirement: Payout input formatting
+The system SHALL format the payout input with two decimal places on blur, matching the money display format used elsewhere.
 
-#### Scenario: Reverse mode with negative edge (RTP > 100%)
-- **WHEN** RTP exceeds 100% in reverse mode (10% GGR column)
-- **THEN** the system SHALL indicate that a positive payout is impossible when players win more than they lose
+#### Scenario: Payout formatted on blur
+- **WHEN** the user types "3000" in the payout field and tabs out
+- **THEN** the field SHALL display "3,000.00"
 
-### Requirement: Reverse mode updates the shared input area
-When in reverse mode, the shared input area at the top SHALL accept a target payout value instead of a wagered amount.
+### Requirement: No mode toggle
+The system SHALL NOT introduce a separate reverse calculation mode — the payout input is always visible and always linked to the wager.
 
-#### Scenario: Input label changes in reverse mode
-- **WHEN** the calculator is in reverse mode
-- **THEN** the input label SHALL read "Desired Payout" (or equivalent)
-- **AND** the preset amount chips SHALL be hidden
-
-#### Scenario: Target payout input updates results
-- **WHEN** the user types a target payout value in reverse mode
-- **THEN** both model columns SHALL recalculate with their respective RTP values
-
-### Requirement: Forward mode is unchanged
-The system SHALL preserve all existing forward-mode behavior when the toggle is in its default position.
-
-#### Scenario: Default mode is forward
-- **WHEN** the page loads
-- **THEN** the calculator SHALL be in forward (Wager → Payout) mode
-- **AND** all existing behavior SHALL be identical to the current version
-
-#### Scenario: Forward mode after switching back
-- **WHEN** the user toggles from reverse back to forward mode
-- **THEN** the calculator SHALL restore forward-mode behavior with all current values
+#### Scenario: Single unified UI
+- **WHEN** the user loads the page
+- **THEN** they SHALL see both the Total Wagered input and the Money I Receive input
+- **AND** there SHALL be no mode switch or toggle controlling which input is active

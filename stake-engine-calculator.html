@@ -77,8 +77,7 @@
     gap: 16px;
   }
 
-  .theme-toggle,
-  .mode-toggle {
+  .theme-toggle {
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -90,15 +89,12 @@
     box-shadow: var(--shadow);
   }
 
-  .mode-toggle {
-    margin-bottom: 18px;
-  }
-
-  .theme-toggle button,
-  .mode-toggle button {
+  .theme-toggle button {
     border: none;
     background: transparent;
     color: var(--text-dim);
+    width: 34px;
+    height: 34px;
     border-radius: 999px;
     cursor: pointer;
     display: flex;
@@ -107,21 +103,7 @@
     transition: background 0.15s, color 0.15s;
   }
 
-  .theme-toggle button {
-    width: 34px;
-    height: 34px;
-  }
-
-  .mode-toggle button {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    padding: 7px 14px;
-    white-space: nowrap;
-  }
-
-  .theme-toggle button.active,
-  .mode-toggle button.active {
+  .theme-toggle button.active {
     background: var(--input-bg);
     color: var(--accent);
   }
@@ -631,12 +613,8 @@
   <p class="sub">Compare the 7.5% Guaranteed model side by side with the 10% GGR revenue share.</p>
 
   <div class="panel">
-    <div class="mode-toggle" role="group" aria-label="Calculation mode">
-      <button type="button" id="forwardModeBtn" class="active" aria-pressed="true">Wager → Payout</button>
-      <button type="button" id="reverseModeBtn" aria-pressed="false">Payout → Wager</button>
-    </div>
     <div class="field">
-      <label id="modeInputLabel">Total Wagered <span id="modeSubLabel" style="font-size:11px; color:var(--muted-text); text-transform:none;">shared across both models</span></label>
+      <label>Total Wagered <span style="font-size:11px; color:var(--muted-text); text-transform:none;">shared across both models</span></label>
       <div class="wager-input-row">
         <span class="currency-prefix">$</span>
         <input type="text" id="wagerInput" value="1,000,000" inputmode="numeric">
@@ -708,10 +686,6 @@
         </div>
 
         <div class="breakdown">
-          <div class="breakdown-item" id="reqWagerItem75" style="display:none">
-            <div class="k">Required Wagered</div>
-            <div class="v" id="reqWagerOut75">$0</div>
-          </div>
           <div class="breakdown-item">
             <div class="k">Expected GGR</div>
             <div class="v" id="ggrOut75">$40,000.00</div>
@@ -783,10 +757,6 @@
         </div>
 
         <div class="breakdown">
-          <div class="breakdown-item" id="reqWagerItem10" style="display:none">
-            <div class="k">Required Wagered</div>
-            <div class="v" id="reqWagerOut10">$0</div>
-          </div>
           <div class="breakdown-item">
             <div class="k">Actual GGR</div>
             <div class="v" id="ggrOut10">$40,000.00</div>
@@ -807,20 +777,7 @@
 <script>
   const wagerInput = document.getElementById('wagerInput');
   const presetRow = document.getElementById('presetRow');
-
-  const modeInputLabel = document.getElementById('modeInputLabel');
-  const modeSubLabel = document.getElementById('modeSubLabel');
-  const forwardModeBtn = document.getElementById('forwardModeBtn');
-  const reverseModeBtn = document.getElementById('reverseModeBtn');
-
-  const reqWagerItem75 = document.getElementById('reqWagerItem75');
-  const reqWagerOut75 = document.getElementById('reqWagerOut75');
-  const reqWagerItem10 = document.getElementById('reqWagerItem10');
-  const reqWagerOut10 = document.getElementById('reqWagerOut10');
-
   const appendZerosBtn = document.getElementById('appendZerosBtn');
-
-  let reverseMode = false;
 
   const rtpSlider75 = document.getElementById('rtpSlider75');
   const rtpText75 = document.getElementById('rtpText75');
@@ -1050,107 +1007,19 @@
     return periodShare;
   }
 
-  function recalcFixed75Reverse(targetPayout) {
-    const rtp = currentRtp75();
-    const edge = 100 - rtp;
 
-    if (edge <= 0) {
-      const label = edge === 0 ? 'N/A' : 'impossible';
-      resultValue75.textContent = formatMoney(targetPayout);
-      flowWager75.textContent = label;
-      flowEdge75.textContent = edge.toFixed(1) + '% edge';
-      flowGGR75.textContent = '—';
-      flowGross75.textContent = '—';
-      ggrOut75.textContent = '—';
-      grossOut75.textContent = '—';
-      reqWagerOut75.textContent = label;
-      return;
-    }
-
-    const wager = targetPayout / (0.075 * edge / 100);
-    const ggr = wager * (edge / 100);
-    const gross = ggr * 0.075;
-
-    resultValue75.textContent = formatMoney(targetPayout);
-    flowWager75.textContent = '$' + formatInt(Math.round(wager));
-    flowEdge75.textContent = edge.toFixed(1) + '% edge';
-    flowGGR75.textContent = formatMoney(ggr) + ' GGR';
-    flowGross75.textContent = formatMoney(gross);
-    ggrOut75.textContent = formatMoney(ggr);
-    grossOut75.textContent = formatMoney(gross);
-    reqWagerOut75.textContent = '$' + formatInt(Math.round(wager));
-  }
-
-  function recalcGGR10Reverse(targetPayout) {
-    const rtp = currentRtp10();
-    const edge = 100 - rtp;
-    rtpText10.classList.toggle('hot', rtp > 100);
-    rtpSlider10.classList.toggle('hot', rtp > 100);
-
-    if (edge <= 0) {
-      const label = edge === 0 ? 'N/A' : 'impossible';
-      resultPanel10.classList.remove('has-debt');
-      resultLabel10.textContent = 'You receive';
-      resultValue10.textContent = formatMoney(targetPayout);
-      resultValue10.classList.remove('debt-active');
-      resultNote10.textContent = 'Payout target cannot be met at this RTP (zero or negative edge).';
-      flowWager10.textContent = label;
-      flowEdge10.textContent = (edge >= 0 ? edge.toFixed(1) : '−' + Math.abs(edge).toFixed(1)) + '% edge';
-      flowGGR10.textContent = '—';
-      flowGross10.textContent = '—';
-      ggrOut10.textContent = '—';
-      ggrOut10.classList.remove('neg');
-      grossOut10.textContent = '—';
-      grossOut10.classList.remove('neg');
-      reqWagerOut10.textContent = label;
-      return;
-    }
-
-    const wager = targetPayout / (0.10 * edge / 100);
-    const ggr = wager * (edge / 100);
-    const periodShare = ggr * 0.10;
-
-    resultPanel10.classList.remove('has-debt');
-    resultLabel10.textContent = 'You receive';
-    resultValue10.textContent = formatMoney(targetPayout);
-    resultValue10.classList.remove('debt-active');
-    resultNote10.textContent = 'Based on the required wager for this target payout.';
-
-    flowWager10.textContent = '$' + formatInt(Math.round(wager));
-    flowEdge10.textContent = (edge >= 0 ? edge.toFixed(1) : '−' + Math.abs(edge).toFixed(1)) + '% edge';
-    flowGGR10.textContent = formatMoney(ggr) + ' GGR';
-    flowGross10.textContent = formatMoney(periodShare);
-    ggrOut10.textContent = formatMoney(ggr);
-    ggrOut10.classList.toggle('neg', ggr < 0);
-    grossOut10.textContent = formatMoney(periodShare);
-    grossOut10.classList.toggle('neg', periodShare < 0);
-    reqWagerOut10.textContent = '$' + formatInt(Math.round(wager));
-  }
 
   function recalc() {
     syncPresetHighlight();
-    if (reverseMode) {
-      const target = parseNum(wagerInput.value);
-      recalcFixed75Reverse(target);
-      recalcGGR10Reverse(target);
-    } else {
-      recalcFixed75();
-      recalcGGR10();
-    }
+    recalcFixed75();
+    recalcGGR10();
   }
 
   wagerInput.addEventListener('input', recalc);
   wagerInput.addEventListener('blur', () => { sanitizeInputOnBlur(wagerInput); recalc(); });
 
-  function randomTargetPayout() {
-    const min = Math.log(100);
-    const max = Math.log(100000);
-    const val = Math.exp(min + Math.random() * (max - min));
-    return Math.round(val);
-  }
-
   document.getElementById('wagerRandomBtn').addEventListener('click', () => {
-    wagerInput.value = formatInt(reverseMode ? randomTargetPayout() : randomWager());
+    wagerInput.value = formatInt(randomWager());
     recalc();
   });
 
@@ -1170,31 +1039,6 @@
 
   rtpPool = generateRTPPool(RTP_POOL_SIZE);
   recalc();
-
-  // --- Mode toggle ---
-  function setMode(reverse) {
-    reverseMode = reverse;
-    forwardModeBtn.classList.toggle('active', !reverse);
-    forwardModeBtn.setAttribute('aria-pressed', String(!reverse));
-    reverseModeBtn.classList.toggle('active', reverse);
-    reverseModeBtn.setAttribute('aria-pressed', String(reverse));
-
-    if (reverse) {
-      modeInputLabel.textContent = 'Desired Payout';
-      modeSubLabel.textContent = 'per model, independently computed';
-    } else {
-      modeInputLabel.textContent = 'Total Wagered';
-      modeSubLabel.textContent = 'shared across both models';
-    }
-    presetRow.style.display = reverse ? 'none' : '';
-    reqWagerItem75.style.display = reverse ? '' : 'none';
-    reqWagerItem10.style.display = reverse ? '' : 'none';
-
-    recalc();
-  }
-
-  forwardModeBtn.addEventListener('click', () => setMode(false));
-  reverseModeBtn.addEventListener('click', () => setMode(true));
 
   // --- Theme toggle (dark / light) ---
   const darkModeBtn = document.getElementById('darkModeBtn');
