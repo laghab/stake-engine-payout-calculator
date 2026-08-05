@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stake Engine Payout Calculator</title>
+<link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0d10'/%3E%3Ctext x='16' y='24' font-family='monospace' font-size='23' font-weight='700' text-anchor='middle' fill='%233ddc97'%3E$%3C/text%3E%3C/svg%3E">
 <style>
   @font-face {
     font-family: 'JetBrains Mono';
@@ -94,6 +95,7 @@
     /* -- structure (owned by [data-family]) -- */
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+    --font-display: 'Inter Display', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     --radius-lg: 14px;
     --radius-md: 8px;
     --radius-sm: 6px;
@@ -103,6 +105,9 @@
     --border-w: 1px;
     --panel-blur: none;
     --panel-bg: var(--panel);
+    /* Floating surfaces can't borrow a see-through panel unless the family
+       also blurs what is behind them, or the content underneath reads through. */
+    --overlay-bg: var(--panel-bg);
     --panel-sheen: none;
     --accent-glow: none;
     --result-bg: linear-gradient(180deg, var(--accent-softer), transparent);
@@ -224,6 +229,7 @@
   }
 
   h1 {
+    font-family: var(--font-display);
     font-size: 28px;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -414,6 +420,9 @@
 
   .currency-prefix {
     position: absolute;
+    /* A clip-path on the input (Cyberpunk) makes it a stacking context, which
+       otherwise paints its opaque fill over this sibling. */
+    z-index: 1;
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
@@ -1120,6 +1129,7 @@
   /* --- Terminal: monospace, square, phosphor glow, CRT scanlines --- */
   [data-family="terminal"] {
     --font-sans: var(--font-mono);
+    --font-display: var(--font-mono);
     --radius-lg: 0px;
     --radius-md: 0px;
     --radius-sm: 0px;
@@ -1160,6 +1170,7 @@
 
   /* --- Liquid Glass: translucent, blurred, specular highlight --- */
   [data-family="glass"] {
+    --font-display: 'SF Pro Display', 'Segoe UI Variable Display', 'Helvetica Neue', 'Inter', system-ui, sans-serif;
     --radius-lg: 26px;
     --radius-md: 16px;
     --radius-sm: 12px;
@@ -1189,12 +1200,23 @@
     background-attachment: fixed;
   }
 
+  [data-family="glass"] h1 {
+    font-weight: 300;
+    font-size: 34px;
+    letter-spacing: -0.025em;
+    background: linear-gradient(100deg, var(--text), var(--accent) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   [data-family="glass"] .arrow-flow .step,
   [data-family="glass"] .rtp-text-input { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 
   /* --- Material You: tonal surfaces, generous radii, pill controls --- */
   [data-family="material"] {
     --font-sans: 'Google Sans', 'Product Sans', Roboto, system-ui, -apple-system, sans-serif;
+    --font-display: 'Google Sans Display', 'Google Sans', 'Product Sans', Roboto, system-ui, sans-serif;
     --radius-lg: 28px;
     --radius-md: 18px;
     --radius-sm: 14px;
@@ -1219,6 +1241,8 @@
 
   /* Borderless surfaces still need the internal rules, so put them back as
      tonal dividers rather than leaning on --border-w. */
+  [data-family="material"] h1 { font-weight: 500; letter-spacing: -0.005em; font-size: 30px; }
+
   [data-family="material"] .breakdown,
   [data-family="material"] .arrow-flow,
   [data-family="material"] .game-profit {
@@ -1243,6 +1267,7 @@
   /* --- Neo-Brutalist: 2px ink borders, hard offset shadows --- */
   [data-family="brutalist"] {
     --font-sans: 'Archivo Black', 'Arial Black', Impact, system-ui, sans-serif;
+    --font-display: 'Archivo Black', 'Arial Black', Haettenschweiler, Impact, sans-serif;
     --radius-lg: 0px;
     --radius-md: 0px;
     --radius-sm: 0px;
@@ -1258,6 +1283,8 @@
 
   [data-family="brutalist"] h1,
   [data-family="brutalist"] .compare-col-header { text-transform: uppercase; letter-spacing: -0.02em; }
+
+  [data-family="brutalist"] h1 { font-size: 34px; font-weight: 900; text-shadow: 3px 3px 0 var(--accent); }
 
   [data-family="brutalist"] .result-panel { border-color: var(--fg); box-shadow: 6px 6px 0 var(--accent); }
   [data-family="brutalist"] .result-panel.has-debt { box-shadow: 6px 6px 0 var(--debt); }
@@ -1276,6 +1303,7 @@
   /* --- Paper: serif, hairlines, print-like, no fills --- */
   [data-family="paper"] {
     --font-sans: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    --font-display: 'Playfair Display', 'Didot', 'Bodoni MT', 'Iowan Old Style', Georgia, serif;
     --font-mono: 'Courier New', ui-monospace, monospace;
     --radius-lg: 3px;
     --radius-md: 2px;
@@ -1288,15 +1316,97 @@
     --shadow: none;
     --result-bg: none;
     --result-debt-bg: none;
+    --overlay-bg: var(--panel-base);
     --page-texture: radial-gradient(circle, color-mix(in srgb, var(--fg) 9%, transparent) 0 1px, transparent 1px);
     --page-texture-size: 5px 5px;
     --page-texture-opacity: 0.5;
   }
 
-  [data-family="paper"] h1 { font-weight: 600; }
+  [data-family="paper"] h1 { font-weight: 600; font-size: 34px; letter-spacing: -0.015em; }
   [data-family="paper"] .eyebrow { letter-spacing: 0.26em; }
   [data-family="paper"] .result-panel { border-width: 1px 0; }
   [data-family="paper"] input.result-value { font-family: var(--font-sans); }
+
+  /* --- Cyberpunk: notched panels, scanlines, uppercase, neon edge ---
+     Modelled on CD PROJEKT RED's UI language (Vladimír Vilimovský's HUD work):
+     angular cut corners, hard inset edges, no radii. The corner cuts are
+     clip-path, so the "borders" are inset shadows — an outer border or shadow
+     would be clipped away by the notch. */
+  [data-family="cyber"] {
+    --font-sans: 'Rajdhani', 'Oswald', 'Archivo Narrow', 'Segoe UI', system-ui, sans-serif;
+    --font-display: 'Rajdhani', 'Oswald', 'Archivo Narrow', 'Impact', system-ui, sans-serif;
+    --radius-lg: 0px;
+    --radius-md: 0px;
+    --radius-sm: 0px;
+    --radius-xs: 0px;
+    --radius-pill: 0px;
+    --radius-round: 0px;
+    --border-w: 0px;
+    --notch: 14px;
+    --notch-sm: 7px;
+    --panel: color-mix(in oklab, var(--panel-base), var(--bg) 35%);
+    --panel-border: color-mix(in oklab, var(--bg), var(--accent) 38%);
+    --input-bg: color-mix(in oklab, var(--bg), var(--fg) 7%);
+    --track: color-mix(in oklab, var(--bg), var(--accent) 30%);
+    --shadow: none;
+    --overlay-bg: var(--panel-base);
+    --result-bg: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent 62%);
+    --result-debt-bg: linear-gradient(135deg, color-mix(in srgb, var(--debt) 20%, transparent), transparent 62%);
+    --page-texture: repeating-linear-gradient(to bottom, rgba(0,0,0,0.3) 0 1px, transparent 1px 4px);
+    --page-texture-opacity: 0.5;
+  }
+
+  [data-family="cyber"] .panel,
+  [data-family="cyber"] .game-card,
+  [data-family="cyber"] .chart-panel,
+  [data-family="cyber"] .theme-menu,
+  [data-family="cyber"] .keypad {
+    clip-path: polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, var(--notch) 100%, 0 calc(100% - var(--notch)));
+    box-shadow: inset 0 0 0 1px var(--panel-border);
+  }
+
+  [data-family="cyber"] .result-panel {
+    clip-path: polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, var(--notch) 100%, 0 calc(100% - var(--notch)));
+    box-shadow: inset 0 0 0 1px var(--accent-dim), inset 3px 0 0 0 var(--accent);
+  }
+
+  [data-family="cyber"] .result-panel.has-debt {
+    box-shadow: inset 0 0 0 1px var(--debt-dim), inset 3px 0 0 0 var(--debt);
+  }
+
+  [data-family="cyber"] input[type="text"],
+  [data-family="cyber"] .preset-btn,
+  [data-family="cyber"] .tab-btn,
+  [data-family="cyber"] .dice-btn,
+  [data-family="cyber"] .keypad-btn,
+  [data-family="cyber"] .game-type-btn,
+  [data-family="cyber"] .compare-actions button,
+  [data-family="cyber"] .fam-btn,
+  [data-family="cyber"] .theme-menu-foot button {
+    clip-path: polygon(0 0, calc(100% - var(--notch-sm)) 0, 100% var(--notch-sm), 100% 100%, var(--notch-sm) 100%, 0 calc(100% - var(--notch-sm)));
+    box-shadow: inset 0 0 0 1px var(--panel-border);
+  }
+
+  [data-family="cyber"] input[type="text"].result-value { box-shadow: none; clip-path: none; }
+
+  [data-family="cyber"] .breakdown,
+  [data-family="cyber"] .arrow-flow,
+  [data-family="cyber"] .game-profit {
+    border-top: 1px solid color-mix(in oklab, var(--bg), var(--accent) 28%);
+  }
+
+  [data-family="cyber"] h1,
+  [data-family="cyber"] label,
+  [data-family="cyber"] .game-card-row label { text-transform: uppercase; letter-spacing: 0.08em; }
+
+  [data-family="cyber"] h1 {
+    font-weight: 700;
+    font-size: 32px;
+    text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+
+  [data-family="cyber"] input.result-value,
+  [data-family="cyber"] .eyebrow { text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
 
   /* ==========================================================================
      THEME PICKER
@@ -1345,7 +1455,7 @@
     width: min(400px, calc(100vw - 40px));
     max-height: min(70vh, 640px);
     overflow-y: auto;
-    background: var(--panel-bg);
+    background: var(--overlay-bg);
     background-image: var(--panel-sheen);
     backdrop-filter: var(--panel-blur);
     -webkit-backdrop-filter: var(--panel-blur);
@@ -1505,6 +1615,27 @@
 
   .theme-menu-foot button:hover { border-color: var(--accent-dim); color: var(--accent); }
 
+  .theme-lock {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: var(--border-w) solid var(--panel-border);
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+
+  .theme-lock input {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
   @media (max-width: 560px) {
     .theme-open span.theme-open-label { display: none; }
     .pal-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1545,7 +1676,8 @@
       { id: 'glass',     name: 'Liquid Glass', desc: 'Blurred, translucent, specular' },
       { id: 'material',  name: 'Material You', desc: 'Tonal fills, big radii' },
       { id: 'brutalist', name: 'Brutalist',    desc: 'Ink borders, hard shadows' },
-      { id: 'paper',     name: 'Paper',        desc: 'Serif, hairlines, print' }
+      { id: 'paper',     name: 'Paper',        desc: 'Serif, hairlines, print' },
+      { id: 'cyber',     name: 'Cyberpunk',    desc: 'Notched panels, neon edge' }
     ];
 
     // Four seeds per mode — bg, fg, accent, debt. Everything else is mixed
@@ -1593,6 +1725,9 @@
       { id: 'slate', name: 'Slate',
         dark:  { bg: '#0f1319', fg: '#e7ecf3', accent: '#7dd3fc', debt: '#f87171' },
         light: { bg: '#f1f4f8', fg: '#0f1620', accent: '#0369a1', debt: '#dc2626' } },
+      { id: 'cyberpunk', name: 'Cyberpunk',
+        dark:  { bg: '#0b0b0f', fg: '#f2f2e8', accent: '#fcee0a', debt: '#ff003c' },
+        light: { bg: '#e8e8dd', fg: '#0b0b0f', accent: '#8a7f00', debt: '#c8002f' } },
       { id: 'graphite', name: 'Graphite',
         dark:  { bg: '#0a0a0a', fg: '#fafafa', accent: '#e5e5e5', debt: '#ef4444' },
         light: { bg: '#fafafa', fg: '#0a0a0a', accent: '#171717', debt: '#b91c1c' } }
@@ -1615,11 +1750,30 @@
         ? 'light' : 'dark';
     }
 
-    const state = { family: 'studio', palette: 'emerald', mode: osMode() };
-    try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
-    if (!FAMILIES.some(f => f.id === state.family)) state.family = 'studio';
-    if (!PALETTES.some(p => p.id === state.palette)) state.palette = 'emerald';
-    if (state.mode !== 'light' && state.mode !== 'dark') state.mode = osMode();
+    let seen = {};
+    try { seen = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+
+    // Every visit opens on a look you haven't just seen — the stored theme is
+    // kept only to exclude it from the draw — unless the visitor pinned one
+    // with the lock toggle. Mode is deliberately *not* randomised: light/dark
+    // is a comfort preference, not a surprise, so it carries over (falling
+    // back to the OS setting).
+    function pickOther(list, exclude) {
+      const pool = list.filter(x => x.id !== exclude);
+      return pool[Math.floor(Math.random() * pool.length)].id;
+    }
+
+    function keep(list, id, fallback) {
+      return list.some(x => x.id === id) ? id : fallback;
+    }
+
+    const locked = seen.locked === true;
+    const state = {
+      locked: locked,
+      family: locked ? keep(FAMILIES, seen.family, 'studio') : pickOther(FAMILIES, seen.family),
+      palette: locked ? keep(PALETTES, seen.palette, 'emerald') : pickOther(PALETTES, seen.palette),
+      mode: (seen.mode === 'light' || seen.mode === 'dark') ? seen.mode : osMode()
+    };
 
     function apply() {
       const r = document.documentElement;
@@ -1679,6 +1833,10 @@
           <button type="button" id="themeRandomBtn">Surprise me</button>
           <button type="button" id="themeResetBtn">Reset</button>
         </div>
+        <label class="theme-lock">
+          <input type="checkbox" id="themeLockToggle">
+          <span>Lock this theme — otherwise every visit opens on a new one</span>
+        </label>
       </div>
     </div>
   </div>
@@ -2683,6 +2841,8 @@
   const themeLabel = document.getElementById('themeLabel');
   const familyGrid = document.getElementById('familyGrid');
   const paletteGrid = document.getElementById('paletteGrid');
+  const themeLockToggle = document.getElementById('themeLockToggle');
+  const favicon = document.getElementById('favicon');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   familyGrid.innerHTML = TE.FAMILIES.map(f => `
@@ -2705,9 +2865,25 @@
 
   // Swatches preview the palette *in the current mode*, so flipping light/dark
   // repaints them rather than re-rendering the grid.
+  // The tab icon tracks the theme: both seeds are plain hex, so they can be
+  // read straight off the root and dropped into an inline SVG.
+  function paintFavicon() {
+    const cs = getComputedStyle(document.documentElement);
+    const bg = cs.getPropertyValue('--bg').trim() || '#0b0d10';
+    const accent = cs.getPropertyValue('--accent').trim() || '#3ddc97';
+    const round = cs.getPropertyValue('--radius-round').trim() === '0px' ? 0 : 7;
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+      '<rect width="32" height="32" rx="' + round + '" fill="' + bg + '"/>' +
+      '<text x="16" y="24" font-family="monospace" font-size="23" font-weight="700"' +
+      ' text-anchor="middle" fill="' + accent + '">$</text></svg>';
+    favicon.href = 'data:image/svg+xml,' + encodeURIComponent(svg);
+  }
+
   function paintPicker() {
     const s = TE.state;
     themeLabel.textContent = TE.family(s.family).name + ' · ' + TE.palette(s.palette).name;
+    themeLockToggle.checked = s.locked === true;
+    paintFavicon();
     darkModeBtn.classList.toggle('active', s.mode !== 'light');
     lightModeBtn.classList.toggle('active', s.mode === 'light');
     famBtns.forEach(b => {
@@ -2807,6 +2983,11 @@
     themeMenu.hidden = !open;
     themeMenuBtn.setAttribute('aria-expanded', String(open));
   }
+
+  themeLockToggle.addEventListener('change', () => {
+    TE.state.locked = themeLockToggle.checked;
+    TE.apply();
+  });
 
   themeMenuBtn.addEventListener('click', () => setMenuOpen(themeMenu.hidden));
 
