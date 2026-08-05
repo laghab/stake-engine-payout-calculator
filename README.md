@@ -14,7 +14,7 @@ Use it instantly at **[stake-engine-payout-calculator.vercel.app](https://stake-
 2. Set **Total Wagered** — type a value, use the dice button to generate a random figure, hit **000** to append three zeros, or click one of the preset chips ($100K – $5M).
 3. Adjust each model's **RTP** slider (the link button between the columns keeps them in step):
    - **7.5%** — the game's theoretical RTP (90–96.70%). Payout is calculated off expected GGR, so it never moves with variance.
-   - **10%** — the *actual* RTP for the period (75–120%), which you can also randomize. Payout is calculated off actual GGR, so it swings with real player outcomes, including going negative.
+   - **10%** — the *actual* RTP for the period, which you can also randomize. The slider spans 50–200%, and the text box next to it accepts any non-negative figure to two decimals, so you can model an outlier period past the end of the track. Payout is calculated off actual GGR, so it swings with real player outcomes, including going negative.
 4. Read each result panel for the payout, effective house edge, GGR, and the model's own 7.5%/10% cut.
 5. **Work backwards from a payout**: the "You receive" figure in either column is an input. Type the amount you want to earn and the Total Wagered needed to produce it is solved for you, with the other model's payout following along. The field you typed in stays pinned, so moving an RTP slider afterwards re-solves the wager rather than overwriting your number. (A negative-edge period produces a carried-forward debt, which has no valid inverse wager — that field locks until the edge is positive again.)
 6. Use the **Compare** tab to model up to six games at once and chart their payouts against each other.

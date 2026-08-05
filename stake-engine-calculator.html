@@ -273,7 +273,7 @@
   }
 
   .rtp-text-input {
-    width: 50px;
+    width: 62px;
     background: var(--input-bg);
     border: var(--border-w) solid var(--panel-border);
     border-radius: var(--radius-sm);
@@ -1798,12 +1798,12 @@
           <label>
             <span>Actual RTP This Period</span>
             <span class="rtp-value-row">
-              <input type="text" class="rtp-text-input" id="rtpText10" value="96.0" inputmode="decimal">
+              <input type="text" class="rtp-text-input" id="rtpText10" value="96.00" inputmode="decimal">
               <span class="rtp-pct-suffix">%</span>
             </span>
           </label>
-          <input type="range" id="rtpSlider10" min="75" max="120" step="0.1" value="96">
-          <div class="rtp-scale"><span>75%</span><span>96%</span><span>120%</span></div>
+          <input type="range" id="rtpSlider10" min="50" max="200" step="0.01" value="96">
+          <div class="rtp-scale"><span>50%</span><span>125%</span><span>200%</span></div>
           <div style="display:flex; justify-content:flex-end; margin-top:10px;">
             <button type="button" class="dice-btn debt-flavor small" id="rtpRandomBtn" title="Simulate actual RTP for the period" aria-label="Randomize actual RTP">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -2006,7 +2006,7 @@
       rtpPoolIndex = 0;
     }
     const value = rtpPool[rtpPoolIndex++];
-    return Math.max(75, Math.min(120, value));
+    return Math.max(50, Math.min(200, value));
   }
 
   // --- RTP link/sync state ---
@@ -2024,12 +2024,12 @@
     const max = parseFloat(targetSlider.max);
     const clamped = Math.max(min, Math.min(max, value));
     targetSlider.value = clamped;
-    targetText.value = clamped.toFixed(targetSlider === rtpSlider75 ? 2 : 1);
+    targetText.value = clamped.toFixed(2);
   }
 
   // Keep slider <-> text input in sync for a given pair
   function bindRtpControls(slider, text, min, max) {
-    const decimals = slider === rtpSlider75 ? 2 : 1;
+    const decimals = 2;
     slider.addEventListener('input', () => {
       text.value = parseFloat(slider.value).toFixed(decimals);
       propagateLinkedRtp(slider, parseFloat(slider.value));
@@ -2042,7 +2042,9 @@
     });
     text.addEventListener('blur', () => {
       let v = parseFloat(text.value);
-      if (isNaN(v)) v = parseFloat(slider.value);
+      // Garbage (or a literal "Infinity") reverts to the slider rather than
+      // surfacing an error state.
+      if (!isFinite(v)) v = parseFloat(slider.value);
       v = Math.max(min, Math.min(max, v));
       text.value = v.toFixed(decimals);
       slider.value = v;
@@ -2052,7 +2054,10 @@
   }
 
   bindRtpControls(rtpSlider75, rtpText75, 90, 96.70);
-  bindRtpControls(rtpSlider10, rtpText10, 75, 120);
+  // The 10% field takes any non-negative RTP: real periods can run far past
+  // the slider, so the slider is a shortcut and the text box is the source of
+  // truth. Values beyond the track park the handle at its end.
+  bindRtpControls(rtpSlider10, rtpText10, 0, Infinity);
 
   rtpLinkBtn.addEventListener('click', () => {
     rtpLinked = !rtpLinked;
@@ -2164,7 +2169,7 @@
     const periodShare = ggr * 0.10;
 
     flowWager10.textContent = '$' + formatInt(wager);
-    flowEdge10.textContent = (edge >= 0 ? edge.toFixed(1) : '−' + Math.abs(edge).toFixed(1)) + '% edge';
+    flowEdge10.textContent = (edge >= 0 ? edge.toFixed(2) : '−' + Math.abs(edge).toFixed(2)) + '% edge';
     flowGGR10.textContent = formatMoney(ggr) + ' GGR';
     flowGross10.textContent = formatMoney(periodShare);
     ggrOut10.textContent = formatMoney(ggr);
@@ -2231,8 +2236,8 @@
 
   document.getElementById('rtpRandomBtn').addEventListener('click', () => {
     const v = nextRandomRTP();
-    rtpSlider10.value = v.toFixed(1);
-    rtpText10.value = v.toFixed(1);
+    rtpSlider10.value = v.toFixed(2);
+    rtpText10.value = v.toFixed(2);
     propagateLinkedRtp(rtpSlider10, v);
     recalc();
   });
