@@ -11,7 +11,7 @@ Use it instantly at **[stake-engine-payout-calculator.vercel.app](https://stake-
 ## Usage
 
 1. Both models are shown side by side — **7.5% Guaranteed** on the left, **10% GGR** on the right — sharing one wager figure.
-2. Set **Total Wagered** — type a value, use the dice button to generate a random figure, hit **000** to append three zeros, or click one of the preset chips ($100K – $5M).
+2. Set **Total Wagered** — type a value, roll the dice button for a random figure, hit **000** to append three zeros, or click one of the preset chips ($100K – $5M).
 3. Adjust each model's **RTP** slider (the link button between the columns keeps them in step):
    - **7.5%** — the game's theoretical RTP (90–96.70%). Payout is calculated off expected GGR, so it never moves with variance.
    - **10%** — the *actual* RTP for the period, which you can also randomize. The slider spans 50–200%, and the text box next to it accepts any non-negative figure to two decimals, so you can model an outlier period past the end of the track. Payout is calculated off actual GGR, so it swings with real player outcomes, including going negative.
@@ -24,7 +24,7 @@ Use it instantly at **[stake-engine-payout-calculator.vercel.app](https://stake-
 
 A theme is three independent choices, so the combinations multiply out to 256:
 
-- **Style** (8) — Studio, Terminal, Liquid Glass, Material You, Brutalist, Paper, Cyberpunk, Soft UI. Structure only: corner radii, border weight, display typography, and material (backdrop blur, scanlines, tonal fills, hard offset shadows, notched corners, extruded neumorphic light).
+- **Style** (8) — Studio, Terminal, Liquid Glass, Material You, Brutalist, Paper, Cyberpunk, Casino. Structure only: corner radii, border weight, display typography, and material (backdrop blur, scanlines, tonal fills, hard offset shadows, notched corners, felt weave with piped table edges and poker-chip controls).
 - **Palette** (16) — Emerald, Amber, Ice, Violet, Rose, Casino Gold, Phosphor, Nord, Dracula, Gruvbox, Tokyo Night, Catppuccin, Solarized, Slate, Graphite, Cyberpunk.
 - **Mode** (2) — light or dark, defaulting to your OS preference.
 
@@ -34,7 +34,7 @@ The theme is applied in `<head>` before first paint, so there is no flash of a d
 
 Each palette declares only four seed colours per mode — background, foreground, accent, and debt — and every other token (panel, border, five text weights, dim and soft accent variants, glows) is derived from those in CSS with `color-mix()`. Adding a palette is two lines in the `PALETTES` table; the swatches in the picker are generated from that same table, so the UI can't drift from the stylesheet. Styles and modes own disjoint sets of custom properties, which is why all 256 combinations hold together without per-combination overrides.
 
-Switching any of the three animates as a circular reveal from the control you clicked, using the View Transitions API where it exists and falling back to a clip-path overlay wipe elsewhere. It respects `prefers-reduced-motion`.
+Switching any of the three animates as a circular reveal from the control you clicked, using the View Transitions API where it exists and falling back to a clip-path overlay wipe elsewhere. The dice buttons throw: the icon turns a full revolution while its pips are reshuffled, landing on a random face. Both respect `prefers-reduced-motion`.
 
 ### Cyberpunk
 

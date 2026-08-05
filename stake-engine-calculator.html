@@ -424,6 +424,17 @@
     transform: scale(0.92) rotate(-8deg);
   }
 
+  /* A full turn with an overshoot on the way round, so it reads as a throw
+     rather than a spin. The pips are reshuffled by script as it turns. */
+  @keyframes dice-roll {
+    0%   { transform: rotate(0deg) scale(1); }
+    30%  { transform: rotate(170deg) scale(1.16); }
+    65%  { transform: rotate(312deg) scale(0.92); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+
+  .dice-btn.rolling svg { animation: dice-roll 0.55s cubic-bezier(0.36, 0.9, 0.4, 1) both; }
+
   .dice-btn svg {
     width: 18px;
     height: 18px;
@@ -1436,85 +1447,74 @@
   [data-family="cyber"] input.result-value,
   [data-family="cyber"] .eyebrow { text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
 
-  /* --- Soft UI: no borders at all, form comes from extruded light --- */
-  [data-family="soft"] {
-    --font-sans: 'Poppins', 'Nunito', 'SF Pro Rounded', 'Segoe UI Variable', system-ui, sans-serif;
-    --font-display: 'Poppins', 'Nunito', 'SF Pro Rounded', 'Segoe UI Variable', system-ui, sans-serif;
-    --radius-lg: 22px;
-    --radius-md: 14px;
-    --radius-sm: 11px;
-    --radius-xs: 8px;
-    --border-w: 0px;
-    /* Surfaces sit at exactly page level; the two shadows are the whole idiom,
-       and both are mixed from --bg so any palette extrudes correctly. */
-    --panel: var(--bg);
-    --panel-bg: var(--bg);
-    --panel-border: transparent;
-    --input-bg: var(--bg);
-    --overlay-bg: var(--bg);
-    --soft-hi: color-mix(in oklab, var(--bg), #ffffff 55%);
-    --soft-lo: color-mix(in oklab, var(--bg), #000000 45%);
-    --shadow: -6px -6px 14px var(--soft-hi), 7px 7px 16px var(--soft-lo);
-    --shadow-lg: -8px -8px 20px var(--soft-hi), 10px 10px 26px var(--soft-lo);
-    --track: color-mix(in oklab, var(--bg), var(--fg) 12%);
-    --result-bg: var(--bg);
-    --result-debt-bg: var(--bg);
+  /* --- Casino: felt cloth, piped table edges, chip-shaped controls --- */
+  [data-family="casino"] {
+    --font-sans: 'Optima', 'Palatino Linotype', 'Iowan Old Style', Georgia, serif;
+    --font-display: 'Cinzel', 'Playfair Display', 'Optima', Georgia, serif;
+    --radius-lg: 18px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+    --border-w: 1px;
+    /* The table takes a little accent so the surface reads as cloth rather
+       than as another neutral panel, and the weave is a 45° repeat. */
+    --panel: color-mix(in oklab, var(--panel-base), var(--accent) 15%);
+    --panel-border: color-mix(in oklab, var(--bg), var(--accent) 48%);
+    --panel-sheen: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0 2px, transparent 2px 4px);
+    --input-bg: color-mix(in oklab, var(--bg), var(--fg) 9%);
+    --shadow: 0 7px 20px var(--shade);
+    --result-bg: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%);
+    --result-debt-bg: linear-gradient(180deg, color-mix(in srgb, var(--debt) 22%, transparent), transparent 72%);
+    --page-texture: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0 3px, transparent 3px 6px);
+    --page-texture-opacity: 0.85;
   }
 
-  /* A dark surface can't take a bright highlight — the halo has to drop and the
-     shadow deepen, or every panel looks like it is glowing. */
-  [data-mode="dark"][data-family="soft"] {
-    --soft-hi: color-mix(in oklab, var(--bg), #ffffff 20%);
-    --soft-lo: color-mix(in oklab, var(--bg), #000000 62%);
+  /* Table piping: an opaque ring painted over a slightly wider accent ring
+     leaves a hairline of gold set in from the edge, the way a felt layout is
+     stitched. Shadows paint first-on-top, so the cover ring is listed first. */
+  [data-family="casino"] .panel,
+  [data-family="casino"] .game-card,
+  [data-family="casino"] .chart-panel,
+  [data-family="casino"] .theme-menu {
+    box-shadow: inset 0 0 0 5px var(--panel), inset 0 0 0 6px color-mix(in srgb, var(--accent) 45%, transparent), var(--shadow);
   }
 
-  [data-family="soft"] h1 { font-weight: 600; letter-spacing: -0.02em; }
+  [data-family="casino"] .result-panel { border-width: 2px; }
 
-  [data-family="soft"] .result-panel { box-shadow: var(--shadow); }
+  [data-family="casino"] h1 { text-transform: uppercase; letter-spacing: 0.06em; font-size: 30px; }
 
-  /* Anything you type into is pressed *in*; anything you press is raised. */
-  [data-family="soft"] input[type="text"]:not(.result-value),
-  [data-family="soft"] .rtp-text-input,
-  [data-family="soft"] .arrow-flow .step,
-  [data-family="soft"] .game-card-name {
-    box-shadow: inset 3px 3px 6px var(--soft-lo), inset -3px -3px 6px var(--soft-hi);
+  [data-family="casino"] .dice-btn {
+    border-radius: 50%;
+    border-width: 2px;
+    border-style: dashed;
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
   }
 
-  [data-family="soft"] .dice-btn,
-  [data-family="soft"] .preset-btn,
-  [data-family="soft"] .tab-btn,
-  [data-family="soft"] .keypad-btn,
-  [data-family="soft"] .game-type-btn,
-  [data-family="soft"] .rtp-link-btn,
-  [data-family="soft"] .theme-open,
-  [data-family="soft"] .compare-actions button,
-  [data-family="soft"] .theme-menu-foot button {
-    box-shadow: -4px -4px 9px var(--soft-hi), 5px 5px 11px var(--soft-lo);
+  [data-family="casino"] .preset-btn,
+  [data-family="casino"] .tab-btn { border-radius: var(--radius-pill); }
+
+  /* Suits instead of status dots. */
+  [data-family="casino"] .eyebrow::before,
+  [data-family="casino"] .compare-col-header::before {
+    content: '\2660';
+    width: auto;
+    height: auto;
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    font-size: 12px;
+    line-height: 1;
   }
 
-  [data-family="soft"] .dice-btn:active,
-  [data-family="soft"] .preset-btn:active,
-  [data-family="soft"] .preset-btn.active,
-  [data-family="soft"] .tab-btn:active,
-  [data-family="soft"] .tab-btn.active,
-  [data-family="soft"] .keypad-btn:active,
-  [data-family="soft"] .game-type-btn.active {
-    box-shadow: inset 3px 3px 7px var(--soft-lo), inset -3px -3px 7px var(--soft-hi);
-  }
-
-  [data-family="soft"] input[type="range"] {
-    box-shadow: inset 2px 2px 4px var(--soft-lo), inset -2px -2px 4px var(--soft-hi);
-    height: 8px;
-  }
-
-  [data-family="soft"] input[type="range"]::-webkit-slider-thumb {
-    box-shadow: -2px -2px 5px var(--soft-hi), 3px 3px 6px var(--soft-lo);
-  }
-
-  [data-family="soft"] .breakdown,
-  [data-family="soft"] .arrow-flow,
-  [data-family="soft"] .game-profit {
-    border-top: 1px solid color-mix(in oklab, var(--bg), var(--fg) 10%);
+  /* .compare-col.ggr10 .compare-col-header::before outranks the family rule
+     above, so the dot's background has to be cleared here too. */
+  [data-family="casino"] .compare-col.ggr10 .compare-col-header::before {
+    content: '\2666';
+    width: auto;
+    height: auto;
+    background: none;
+    border-radius: 0;
+    color: var(--debt);
   }
 
   /* ==========================================================================
@@ -1647,7 +1647,7 @@
   .fam-chip[data-fam="brutalist"] { border-radius: 0; border-width: 2px; box-shadow: 3px 3px 0 currentColor; }
   .fam-chip[data-fam="paper"]     { border-radius: 2px; border-width: 1px 0; }
   .fam-chip[data-fam="cyber"]      { border-radius: 0; clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px)); }
-  .fam-chip[data-fam="soft"]       { border-radius: 9px; border-color: transparent; box-shadow: -2px -2px 4px color-mix(in srgb, currentColor 35%, transparent), 3px 3px 5px color-mix(in srgb, currentColor 55%, transparent); }
+  .fam-chip[data-fam="casino"]     { border-radius: 8px; box-shadow: inset 0 0 0 3px var(--panel), inset 0 0 0 4px currentColor; }
 
   .pal-grid {
     display: grid;
@@ -1789,7 +1789,7 @@
       { id: 'brutalist', name: 'Brutalist',    desc: 'Ink borders, hard shadows' },
       { id: 'paper',     name: 'Paper',        desc: 'Serif, hairlines, print' },
       { id: 'cyber',     name: 'Cyberpunk',    desc: 'Notched panels, neon edge' },
-      { id: 'soft',      name: 'Soft UI',      desc: 'No borders, extruded light' }
+      { id: 'casino',    name: 'Casino',       desc: 'Felt, piped edges, chips' }
     ];
 
     // Four seeds per mode — bg, fg, accent, debt. Everything else is mixed
@@ -2225,6 +2225,59 @@
     el.value = formatInt(n);
   }
 
+  // --- Dice roll ---
+  // The icon turns a full revolution while the pips are reshuffled underneath,
+  // landing on a random face. Purely decorative: the value each button produces
+  // is drawn by its own handler and owes nothing to the face shown.
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const DICE_FACES = {
+    1: [[12, 12]],
+    2: [[8, 8], [16, 16]],
+    3: [[8, 8], [12, 12], [16, 16]],
+    4: [[8, 8], [16, 8], [8, 16], [16, 16]],
+    5: [[8, 8], [16, 8], [12, 12], [8, 16], [16, 16]],
+    6: [[8, 8], [16, 8], [8, 12], [16, 12], [8, 16], [16, 16]]
+  };
+
+  function paintDiceFace(svg, face) {
+    svg.querySelectorAll('circle').forEach(c => c.remove());
+    DICE_FACES[face].forEach(([cx, cy]) => {
+      const pip = document.createElementNS(SVG_NS, 'circle');
+      pip.setAttribute('cx', cx);
+      pip.setAttribute('cy', cy);
+      pip.setAttribute('r', '1.2');
+      pip.setAttribute('fill', 'currentColor');
+      pip.setAttribute('stroke', 'none');
+      svg.appendChild(pip);
+    });
+  }
+
+  function rollDice(btn) {
+    const svg = btn.querySelector('svg');
+    if (!svg) return;
+    const face = () => 1 + Math.floor(Math.random() * 6);
+    if (reducedMotion.matches) { paintDiceFace(svg, face()); return; }
+
+    // Re-adding the class alone won't restart a running animation; the reflow
+    // read in between is what makes a rapid second click roll again.
+    btn.classList.remove('rolling');
+    void btn.offsetWidth;
+    btn.classList.add('rolling');
+
+    let flips = 0;
+    const tumble = setInterval(() => {
+      paintDiceFace(svg, face());
+      if (++flips >= 5) clearInterval(tumble);
+    }, 90);
+    // animationend can never arrive — a backgrounded tab, or a hidden element —
+    // and a stuck class would leave the icon frozen mid-throw, so a timer backs
+    // it up. Both paths are idempotent.
+    const settle = () => btn.classList.remove('rolling');
+    svg.addEventListener('animationend', settle, { once: true });
+    setTimeout(settle, 700);
+  }
+
   function randomWager() {
     const min = Math.log(10000);
     const max = Math.log(5000000);
@@ -2492,7 +2545,8 @@
   wagerInput.addEventListener('input', recalcFromWager);
   wagerInput.addEventListener('blur', () => { sanitizeInputOnBlur(wagerInput); recalcFromWager(); });
 
-  document.getElementById('wagerRandomBtn').addEventListener('click', () => {
+  document.getElementById('wagerRandomBtn').addEventListener('click', (e) => {
+    rollDice(e.currentTarget);
     wagerInput.value = formatInt(clampWager(randomWager()));
     recalcFromWager();
   });
@@ -2504,7 +2558,8 @@
     recalcFromWager();
   });
 
-  document.getElementById('rtpRandomBtn').addEventListener('click', () => {
+  document.getElementById('rtpRandomBtn').addEventListener('click', (e) => {
+    rollDice(e.currentTarget);
     const v = nextRandomRTP();
     rtpSlider10.value = v.toFixed(2);
     rtpText10.value = v.toFixed(2);
@@ -2955,7 +3010,6 @@
   const paletteGrid = document.getElementById('paletteGrid');
   const themeLockToggle = document.getElementById('themeLockToggle');
   const favicon = document.getElementById('favicon');
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   familyGrid.innerHTML = TE.FAMILIES.map(f => `
     <button type="button" class="fam-btn" data-family-id="${f.id}" aria-pressed="false">
