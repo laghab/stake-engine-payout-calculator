@@ -22,23 +22,23 @@ Use it instantly at **[stake-engine-payout-calculator.vercel.app](https://stake-
 
 ## Theming
 
-A theme is three independent choices, so the combinations multiply out to 224:
+A theme is three independent choices, so the combinations multiply out to 256:
 
-- **Style** (7) — Studio, Terminal, Liquid Glass, Material You, Brutalist, Paper, Cyberpunk. Structure only: corner radii, border weight, display typography, and material (backdrop blur, scanlines, tonal fills, hard offset shadows, notched corners).
+- **Style** (8) — Studio, Terminal, Liquid Glass, Material You, Brutalist, Paper, Cyberpunk, Soft UI. Structure only: corner radii, border weight, display typography, and material (backdrop blur, scanlines, tonal fills, hard offset shadows, notched corners, extruded neumorphic light).
 - **Palette** (16) — Emerald, Amber, Ice, Violet, Rose, Casino Gold, Phosphor, Nord, Dracula, Gruvbox, Tokyo Night, Catppuccin, Solarized, Slate, Graphite, Cyberpunk.
 - **Mode** (2) — light or dark, defaulting to your OS preference.
 
 **Every visit opens on a style and palette you didn't see last time** — the previous pick is stored only so it can be excluded from the draw. Tick **Lock this theme** in the picker to pin one instead. Light/dark is never randomised; it's a comfort preference, so it carries over.
 
-The theme is applied in `<head>` before first paint, so there is no flash of a default theme on load. The page title takes a display font per style — condensed uppercase for Cyberpunk, an editorial serif for Paper, gradient-filled light weight for Liquid Glass — and the favicon is generated as an inline SVG recoloured to the live palette.
+The theme is applied in `<head>` before first paint, so there is no flash of a default theme on load. Scrollbars follow it too, via `color-scheme` plus themed thumbs. The page title takes a display font per style — condensed uppercase for Cyberpunk, an editorial serif for Paper, gradient-filled light weight for Liquid Glass — and the favicon is generated as an inline SVG recoloured to the live palette.
+
+Each palette declares only four seed colours per mode — background, foreground, accent, and debt — and every other token (panel, border, five text weights, dim and soft accent variants, glows) is derived from those in CSS with `color-mix()`. Adding a palette is two lines in the `PALETTES` table; the swatches in the picker are generated from that same table, so the UI can't drift from the stylesheet. Styles and modes own disjoint sets of custom properties, which is why all 256 combinations hold together without per-combination overrides.
+
+Switching any of the three animates as a circular reveal from the control you clicked, using the View Transitions API where it exists and falling back to a clip-path overlay wipe elsewhere. It respects `prefers-reduced-motion`.
 
 ### Cyberpunk
 
 Modelled on CD PROJEKT RED's UI language, following [Vladimír Vilimovský's Cyberpunk 2077 interface work](https://www.behance.net/gallery/133185623/Cyberpunk-2077User-Interface-(Part-2)): angular cut corners, hard inset edges, scanlines, uppercase condensed type. The corner cuts are `clip-path`, so the "borders" have to be inset shadows — an outer border or drop shadow would be clipped away by the notch. That gallery uses red as its primary system colour; here the accent is the game's signature yellow, because red already means carried-forward debt in this tool and the two states need to stay distinguishable.
-
-Each palette declares only four seed colours per mode — background, foreground, accent, and debt — and every other token (panel, border, five text weights, dim and soft accent variants, glows) is derived from those in CSS with `color-mix()`. Adding a palette is two lines in the `PALETTES` table; the swatches in the picker are generated from that same table, so the UI can't drift from the stylesheet. Styles and modes own disjoint sets of custom properties, which is why all 180 combinations hold together without per-combination overrides.
-
-Switching any of the three animates as a circular reveal from the control you clicked, using the View Transitions API where it exists and falling back to a clip-path overlay wipe elsewhere. It respects `prefers-reduced-motion`.
 
 ### The 10% GGR randomizer
 

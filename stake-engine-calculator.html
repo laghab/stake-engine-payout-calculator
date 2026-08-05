@@ -117,6 +117,11 @@
     --shadow-lg: 0 20px 55px var(--shade);
   }
 
+  /* Without color-scheme the UA paints its light scrollbar, form controls and
+     canvas over every dark theme — this is what makes the bar read white. */
+  :root { color-scheme: dark; }
+  [data-mode="light"] { color-scheme: light; }
+
   [data-mode="light"] {
     --surface-tint: #ffffff;
     --panel-lift: 72%;
@@ -128,6 +133,29 @@
   }
 
   * { box-sizing: border-box; }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--bg), var(--fg) 26%) transparent;
+  }
+
+  /* WebKit / Blink */
+  ::-webkit-scrollbar { width: 12px; height: 12px; }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner { background: transparent; }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--bg), var(--fg) 26%);
+    border-radius: var(--radius-pill);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--bg), var(--accent) 55%);
+    background-clip: padding-box;
+  }
 
   body {
     margin: 0;
@@ -1408,6 +1436,87 @@
   [data-family="cyber"] input.result-value,
   [data-family="cyber"] .eyebrow { text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
 
+  /* --- Soft UI: no borders at all, form comes from extruded light --- */
+  [data-family="soft"] {
+    --font-sans: 'Poppins', 'Nunito', 'SF Pro Rounded', 'Segoe UI Variable', system-ui, sans-serif;
+    --font-display: 'Poppins', 'Nunito', 'SF Pro Rounded', 'Segoe UI Variable', system-ui, sans-serif;
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --radius-sm: 11px;
+    --radius-xs: 8px;
+    --border-w: 0px;
+    /* Surfaces sit at exactly page level; the two shadows are the whole idiom,
+       and both are mixed from --bg so any palette extrudes correctly. */
+    --panel: var(--bg);
+    --panel-bg: var(--bg);
+    --panel-border: transparent;
+    --input-bg: var(--bg);
+    --overlay-bg: var(--bg);
+    --soft-hi: color-mix(in oklab, var(--bg), #ffffff 55%);
+    --soft-lo: color-mix(in oklab, var(--bg), #000000 45%);
+    --shadow: -6px -6px 14px var(--soft-hi), 7px 7px 16px var(--soft-lo);
+    --shadow-lg: -8px -8px 20px var(--soft-hi), 10px 10px 26px var(--soft-lo);
+    --track: color-mix(in oklab, var(--bg), var(--fg) 12%);
+    --result-bg: var(--bg);
+    --result-debt-bg: var(--bg);
+  }
+
+  /* A dark surface can't take a bright highlight — the halo has to drop and the
+     shadow deepen, or every panel looks like it is glowing. */
+  [data-mode="dark"][data-family="soft"] {
+    --soft-hi: color-mix(in oklab, var(--bg), #ffffff 20%);
+    --soft-lo: color-mix(in oklab, var(--bg), #000000 62%);
+  }
+
+  [data-family="soft"] h1 { font-weight: 600; letter-spacing: -0.02em; }
+
+  [data-family="soft"] .result-panel { box-shadow: var(--shadow); }
+
+  /* Anything you type into is pressed *in*; anything you press is raised. */
+  [data-family="soft"] input[type="text"]:not(.result-value),
+  [data-family="soft"] .rtp-text-input,
+  [data-family="soft"] .arrow-flow .step,
+  [data-family="soft"] .game-card-name {
+    box-shadow: inset 3px 3px 6px var(--soft-lo), inset -3px -3px 6px var(--soft-hi);
+  }
+
+  [data-family="soft"] .dice-btn,
+  [data-family="soft"] .preset-btn,
+  [data-family="soft"] .tab-btn,
+  [data-family="soft"] .keypad-btn,
+  [data-family="soft"] .game-type-btn,
+  [data-family="soft"] .rtp-link-btn,
+  [data-family="soft"] .theme-open,
+  [data-family="soft"] .compare-actions button,
+  [data-family="soft"] .theme-menu-foot button {
+    box-shadow: -4px -4px 9px var(--soft-hi), 5px 5px 11px var(--soft-lo);
+  }
+
+  [data-family="soft"] .dice-btn:active,
+  [data-family="soft"] .preset-btn:active,
+  [data-family="soft"] .preset-btn.active,
+  [data-family="soft"] .tab-btn:active,
+  [data-family="soft"] .tab-btn.active,
+  [data-family="soft"] .keypad-btn:active,
+  [data-family="soft"] .game-type-btn.active {
+    box-shadow: inset 3px 3px 7px var(--soft-lo), inset -3px -3px 7px var(--soft-hi);
+  }
+
+  [data-family="soft"] input[type="range"] {
+    box-shadow: inset 2px 2px 4px var(--soft-lo), inset -2px -2px 4px var(--soft-hi);
+    height: 8px;
+  }
+
+  [data-family="soft"] input[type="range"]::-webkit-slider-thumb {
+    box-shadow: -2px -2px 5px var(--soft-hi), 3px 3px 6px var(--soft-lo);
+  }
+
+  [data-family="soft"] .breakdown,
+  [data-family="soft"] .arrow-flow,
+  [data-family="soft"] .game-profit {
+    border-top: 1px solid color-mix(in oklab, var(--bg), var(--fg) 10%);
+  }
+
   /* ==========================================================================
      THEME PICKER
      ========================================================================== */
@@ -1537,6 +1646,8 @@
   .fam-chip[data-fam="material"]  { border-radius: 13px; border-color: transparent; background: color-mix(in srgb, currentColor 30%, transparent); }
   .fam-chip[data-fam="brutalist"] { border-radius: 0; border-width: 2px; box-shadow: 3px 3px 0 currentColor; }
   .fam-chip[data-fam="paper"]     { border-radius: 2px; border-width: 1px 0; }
+  .fam-chip[data-fam="cyber"]      { border-radius: 0; clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px)); }
+  .fam-chip[data-fam="soft"]       { border-radius: 9px; border-color: transparent; box-shadow: -2px -2px 4px color-mix(in srgb, currentColor 35%, transparent), 3px 3px 5px color-mix(in srgb, currentColor 55%, transparent); }
 
   .pal-grid {
     display: grid;
@@ -1677,7 +1788,8 @@
       { id: 'material',  name: 'Material You', desc: 'Tonal fills, big radii' },
       { id: 'brutalist', name: 'Brutalist',    desc: 'Ink borders, hard shadows' },
       { id: 'paper',     name: 'Paper',        desc: 'Serif, hairlines, print' },
-      { id: 'cyber',     name: 'Cyberpunk',    desc: 'Notched panels, neon edge' }
+      { id: 'cyber',     name: 'Cyberpunk',    desc: 'Notched panels, neon edge' },
+      { id: 'soft',      name: 'Soft UI',      desc: 'No borders, extruded light' }
     ];
 
     // Four seeds per mode — bg, fg, accent, debt. Everything else is mixed
