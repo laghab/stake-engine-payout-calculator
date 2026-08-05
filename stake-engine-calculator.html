@@ -10,42 +10,116 @@
     src: local('JetBrains Mono');
   }
 
+  /* ==========================================================================
+     THEME ENGINE
+
+     A theme is three orthogonal axes:
+       family  — structure: radii, border weight, fonts, material (glass,
+                 scanlines, tonal fills). Set via [data-family].
+       palette — colour, as four seeds only: bg, fg, accent, debt.
+                 Set via [data-palette]; the blocks are generated from
+                 the PALETTES table in script so there is one source of truth.
+       mode    — light | dark, via [data-mode]. Each palette carries seeds
+                 for both.
+
+     Every other colour below is mixed from those four seeds, which is why a
+     new palette costs four lines instead of sixteen. Each derived token is
+     declared twice: a literal first (the original dark theme, used by any
+     browser without color-mix()), then the mix that supersedes it.
+     ========================================================================== */
   :root {
+    /* -- palette seeds -- */
     --bg: #0b0d10;
-    --panel: #14171c;
-    --panel-border: #23272e;
-    --text: #e8eaed;
-    --text-dim: #8a919e;
+    --fg: #eef1f5;
     --accent: #3ddc97;
-    --accent-dim: #1f6b4d;
     --debt: #ff6b6b;
-    --debt-dim: #5c2a2a;
-    --input-bg: #0e1013;
-    --scale-text: #4a4f57;
+
+    /* -- mode knobs -- */
+    --surface-tint: #ffffff;   /* direction panels move away from --bg */
+    --panel-lift: 6%;
+    --input-tint: #ffffff;     /* direction inputs move away from --bg */
+    --input-lift: 3%;
+    --dim-mix: 62%;            /* how far *-dim collapses toward --bg */
+    --shade: rgba(0,0,0,0.5);       /* shadow ink for this mode */
+    --shade-weak: transparent;      /* dark mode wants no ambient shadow */
+
+    /* -- derived surfaces --
+       Families restyle --panel / --input-bg in terms of the *-base values, so
+       they never have to know whether the mode is light or dark. Mode knobs and
+       family skins therefore never fight over the same custom property. */
+    --panel-base: #14171c;
+    --panel-base: color-mix(in oklab, var(--bg), var(--surface-tint) var(--panel-lift));
+    --input-base: #0e1013;
+    --input-base: color-mix(in oklab, var(--bg), var(--input-tint) var(--input-lift));
+    --panel: var(--panel-base);
+    --input-bg: var(--input-base);
+    --track: var(--panel-border);
+    --panel-border: #23272e;
+    --panel-border: color-mix(in oklab, var(--bg), var(--fg) 14%);
+
+    /* -- derived text ramp -- */
+    --text: #e8eaed;
+    --text: color-mix(in oklab, var(--bg), var(--fg) 94%);
+    --text-dim: #8a919e;
+    --text-dim: color-mix(in oklab, var(--bg), var(--fg) 56%);
     --muted-text: #565c66;
+    --muted-text: color-mix(in oklab, var(--bg), var(--fg) 40%);
+    --scale-text: #4a4f57;
+    --scale-text: color-mix(in oklab, var(--bg), var(--fg) 33%);
     --footer-text: #3a3f47;
+    --footer-text: color-mix(in oklab, var(--bg), var(--fg) 24%);
+
+    /* -- derived accents -- */
+    --accent-dim: #1f6b4d;
+    --accent-dim: color-mix(in oklab, var(--accent), var(--bg) var(--dim-mix));
+    --debt-dim: #5c2a2a;
+    --debt-dim: color-mix(in oklab, var(--debt), var(--bg) var(--dim-mix));
+    --accent-softer: rgba(61,220,151,0.05);
+    --accent-softer: color-mix(in srgb, var(--accent) 5%, transparent);
+    --accent-soft: rgba(61,220,151,0.10);
+    --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+    --accent-ring: rgba(61,220,151,0.15);
+    --accent-ring: color-mix(in srgb, var(--accent) 15%, transparent);
+    --accent-ring-lg: rgba(61,220,151,0.22);
+    --accent-ring-lg: color-mix(in srgb, var(--accent) 22%, transparent);
+    --debt-soft: rgba(255,107,107,0.10);
+    --debt-soft: color-mix(in srgb, var(--debt) 10%, transparent);
+    --debt-ring: rgba(255,107,107,0.18);
+    --debt-ring: color-mix(in srgb, var(--debt) 18%, transparent);
     --glow-1: rgba(61,220,151,0.05);
+    --glow-1: color-mix(in srgb, var(--accent) 5%, transparent);
     --glow-2: rgba(255,107,107,0.04);
-    --shadow: none;
+    --glow-2: color-mix(in srgb, var(--debt) 4%, transparent);
+
+    /* -- structure (owned by [data-family]) -- */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+    --radius-lg: 14px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+    --radius-xs: 4px;
+    --radius-pill: 999px;
+    --radius-round: 50%;
+    --border-w: 1px;
+    --panel-blur: none;
+    --panel-bg: var(--panel);
+    --panel-sheen: none;
+    --accent-glow: none;
+    --result-bg: linear-gradient(180deg, var(--accent-softer), transparent);
+    --result-debt-bg: linear-gradient(180deg, var(--debt-soft), transparent);
+    --page-texture: none;
+    --shadow: 0 1px 3px var(--shade-weak);
+    --shadow-lg: 0 20px 55px var(--shade);
   }
 
-  [data-theme="light"] {
-    --bg: #f4f5f7;
-    --panel: #ffffff;
-    --panel-border: #e1e4e9;
-    --text: #1a1d21;
-    --text-dim: #6b7280;
-    --accent: #17976a;
-    --accent-dim: #bfe9d9;
-    --debt: #d9433d;
-    --debt-dim: #f6cfcd;
-    --input-bg: #f0f1f4;
-    --scale-text: #9aa1ab;
-    --muted-text: #8c93a0;
-    --footer-text: #b0b5bd;
-    --glow-1: rgba(23,151,106,0.06);
-    --glow-2: rgba(217,67,61,0.05);
-    --shadow: 0 1px 3px rgba(20,23,28,0.06);
+  [data-mode="light"] {
+    --surface-tint: #ffffff;
+    --panel-lift: 72%;
+    --input-tint: #05070a;
+    --input-lift: 3%;
+    --dim-mix: 76%;
+    --shade: rgba(20,23,28,0.16);
+    --shade-weak: rgba(20,23,28,0.07);
   }
 
   * { box-sizing: border-box; }
@@ -57,7 +131,7 @@
       radial-gradient(circle at 15% 10%, var(--glow-1), transparent 40%),
       radial-gradient(circle at 85% 90%, var(--glow-2), transparent 40%);
     color: var(--text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -65,9 +139,24 @@
     transition: background 0.25s ease, color 0.25s ease;
   }
 
+  /* Family texture layer (terminal scanlines, paper grain). Sits above the
+     background and below everything else, and is `none` for most families. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: var(--page-texture);
+    background-size: var(--page-texture-size, auto);
+    opacity: var(--page-texture-opacity, 1);
+  }
+
   .wrap {
     width: 100%;
     max-width: 1000px;
+    position: relative;
+    z-index: 1;
   }
 
   .top-row {
@@ -83,8 +172,8 @@
     align-items: center;
     gap: 6px;
     background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 999px;
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-pill);
     padding: 4px;
     box-shadow: var(--shadow);
   }
@@ -95,7 +184,7 @@
     color: var(--text-dim);
     width: 34px;
     height: 34px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -114,7 +203,7 @@
   }
 
   .eyebrow {
-    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -149,9 +238,12 @@
   }
 
   .panel {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 14px;
+    background: var(--panel-bg);
+    background-image: var(--panel-sheen);
+    backdrop-filter: var(--panel-blur);
+    -webkit-backdrop-filter: var(--panel-blur);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-lg);
     padding: 28px;
     margin-bottom: 20px;
     box-shadow: var(--shadow);
@@ -171,7 +263,7 @@
     font-size: 13px;
     color: var(--text-dim);
     margin-bottom: 10px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
   }
 
   .rtp-value-row {
@@ -183,11 +275,11 @@
   .rtp-text-input {
     width: 50px;
     background: var(--input-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 6px;
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-sm);
     padding: 5px 6px;
     color: var(--accent);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-weight: 600;
     font-size: 12px;
     font-variant-numeric: tabular-nums;
@@ -205,7 +297,7 @@
   }
 
   .rtp-pct-suffix {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     color: var(--text-dim);
     margin-left: -4px;
@@ -215,8 +307,8 @@
     width: 100%;
     -webkit-appearance: none;
     height: 4px;
-    background: var(--panel-border);
-    border-radius: 2px;
+    background: var(--track);
+    border-radius: var(--radius-xs);
     outline: none;
   }
 
@@ -224,26 +316,26 @@
     -webkit-appearance: none;
     width: 18px;
     height: 18px;
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     background: var(--accent);
     cursor: pointer;
-    box-shadow: 0 0 0 4px rgba(61,220,151,0.15);
+    box-shadow: 0 0 0 4px var(--accent-ring);
     transition: box-shadow 0.15s, background 0.15s;
   }
 
   input[type="range"].hot::-webkit-slider-thumb {
     background: var(--debt);
-    box-shadow: 0 0 0 4px rgba(255,107,107,0.18);
+    box-shadow: 0 0 0 4px var(--debt-ring);
   }
 
   input[type="range"]::-webkit-slider-thumb:hover {
-    box-shadow: 0 0 0 6px rgba(61,220,151,0.22);
+    box-shadow: 0 0 0 6px var(--accent-ring-lg);
   }
 
   input[type="range"]::-moz-range-thumb {
     width: 18px;
     height: 18px;
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     background: var(--accent);
     cursor: pointer;
     border: none;
@@ -254,7 +346,7 @@
     justify-content: space-between;
     font-size: 10px;
     color: var(--scale-text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     margin-top: 6px;
   }
 
@@ -273,9 +365,9 @@
     flex-shrink: 0;
     width: 46px;
     height: 46px;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     background: var(--input-bg);
-    border: 1px solid var(--panel-border);
+    border: var(--border-w) solid var(--panel-border);
     color: var(--text-dim);
     cursor: pointer;
     display: flex;
@@ -304,7 +396,7 @@
   }
 
   #appendZerosBtn {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -326,7 +418,7 @@
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 16px;
     pointer-events: none;
   }
@@ -334,11 +426,11 @@
   input[type="text"] {
     width: 100%;
     background: var(--input-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-md);
     padding: 14px 16px 14px 32px;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 16px;
     font-variant-numeric: tabular-nums;
     outline: none;
@@ -347,6 +439,14 @@
 
   input[type="text"]:focus {
     border-color: var(--accent-dim);
+  }
+
+  .cap-warning {
+    font-size: 11px;
+    color: var(--debt);
+    font-family: var(--font-mono);
+    margin-top: 8px;
+    min-height: 16px;
   }
 
   .preset-row {
@@ -360,12 +460,12 @@
     flex: 1 1 calc(16.666% - 7px);
     min-width: 68px;
     background: var(--input-bg);
-    border: 1px solid var(--panel-border);
+    border: var(--border-w) solid var(--panel-border);
     color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     padding: 9px 6px;
-    border-radius: 7px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: border-color 0.15s, color 0.15s, background 0.15s;
   }
@@ -373,13 +473,13 @@
   .preset-btn:hover {
     border-color: var(--accent-dim);
     color: var(--accent);
-    background: rgba(61,220,151,0.05);
+    background: var(--accent-softer);
   }
 
   .preset-btn.active {
     border-color: var(--accent);
     color: var(--accent);
-    background: rgba(61,220,151,0.08);
+    background: var(--accent-soft);
   }
 
   /* Side-by-side comparison grid */
@@ -414,9 +514,9 @@
     flex-shrink: 0;
     width: 34px;
     height: 34px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--panel);
-    border: 1px solid var(--panel-border);
+    border: var(--border-w) solid var(--panel-border);
     color: var(--text-dim);
     cursor: pointer;
     display: flex;
@@ -437,7 +537,7 @@
   }
 
   .rtp-link-btn.linked {
-    background: rgba(61,220,151,0.1);
+    background: var(--accent-soft);
     border-color: var(--accent);
     color: var(--accent);
   }
@@ -449,7 +549,7 @@
   }
 
   .compare-col-header {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -483,37 +583,76 @@
 
   /* Result panel */
   .result-panel {
-    background: linear-gradient(180deg, rgba(61,220,151,0.06), rgba(61,220,151,0.02));
-    border: 1px solid var(--accent-dim);
-    border-radius: 14px;
+    background: var(--result-bg);
+    backdrop-filter: var(--panel-blur);
+    -webkit-backdrop-filter: var(--panel-blur);
+    border: var(--border-w) solid var(--accent-dim);
+    border-radius: var(--radius-lg);
     padding: 24px;
+    box-shadow: var(--shadow);
   }
 
   .result-panel.has-debt {
-    background: linear-gradient(180deg, rgba(255,107,107,0.05), rgba(255,107,107,0.01));
+    background: var(--result-debt-bg);
     border-color: var(--debt-dim);
   }
 
   .result-label {
     font-size: 12px;
     color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     letter-spacing: 0.05em;
     text-transform: uppercase;
     margin-bottom: 8px;
   }
 
-  .result-value {
+  .result-hint {
+    font-size: 10px;
+    color: var(--muted-text);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-xs);
+    padding: 1px 5px;
+    margin-left: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  /* The payout is an input, not a readout: typing in it back-solves the
+     wager. Chrome-free until hovered or focused so it still reads as the
+     headline figure rather than a form field. */
+  input[type="text"].result-value {
     font-size: 34px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
     color: var(--accent);
-    margin-bottom: 4px;
+    margin: 0 0 4px -9px;
+    width: calc(100% + 9px);
+    background: transparent;
+    border: var(--border-w) solid transparent;
+    border-radius: var(--radius-md);
+    padding: 2px 8px;
+    transition: border-color 0.15s, background 0.15s;
   }
 
-  .result-value.debt-active { color: var(--debt); }
+  input[type="text"].result-value:hover:not([readonly]) {
+    border-color: var(--panel-border);
+  }
+
+  input[type="text"].result-value:focus {
+    border-color: var(--accent-dim);
+    background: var(--input-bg);
+  }
+
+  input[type="text"].result-value[readonly] {
+    cursor: default;
+  }
+
+  input[type="text"].result-value.debt-active { color: var(--debt); }
+
+  input[type="text"].result-value.debt-active:focus {
+    border-color: var(--debt-dim);
+  }
 
   .result-note {
     font-size: 12.5px;
@@ -524,14 +663,14 @@
   .breakdown {
     margin-top: 18px;
     padding-top: 16px;
-    border-top: 1px solid var(--panel-border);
+    border-top: var(--border-w) solid var(--panel-border);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
   }
 
   .breakdown-item {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
   }
 
   .breakdown-item .k {
@@ -556,8 +695,8 @@
     gap: 6px;
     margin-top: 18px;
     padding-top: 16px;
-    border-top: 1px solid var(--panel-border);
-    font-family: 'JetBrains Mono', monospace;
+    border-top: var(--border-w) solid var(--panel-border);
+    font-family: var(--font-mono);
     font-size: 11px;
     color: var(--text-dim);
     flex-wrap: wrap;
@@ -568,8 +707,8 @@
 
   .arrow-flow .step {
     background: var(--input-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 6px;
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-sm);
     padding: 5px 8px;
     color: var(--text);
     font-variant-numeric: tabular-nums;
@@ -584,9 +723,920 @@
     font-size: 11px;
     color: var(--footer-text);
     margin-top: 24px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
+  }
+
+  /* --- Tab navigation --- */
+  .tab-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .tab-btn {
+    background: var(--panel);
+    border: var(--border-w) solid var(--panel-border);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .tab-btn:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .tab-btn.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* --- Compare mode --- */
+  .compare-games {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .game-card {
+    background: var(--panel-bg);
+    background-image: var(--panel-sheen);
+    backdrop-filter: var(--panel-blur);
+    -webkit-backdrop-filter: var(--panel-blur);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    min-height: auto;
+  }
+
+  .game-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .game-card-name {
+    flex: 1;
+    background: var(--input-bg);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+  }
+
+  .game-card-name:focus {
+    border-color: var(--accent-dim);
+  }
+
+  .game-card-remove,
+  .game-card-dup {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    border: var(--border-w) solid var(--panel-border);
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .game-card-remove:hover {
+    border-color: var(--debt-dim);
+    color: var(--debt);
+  }
+
+  .game-card-dup:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .rtp-arrow {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    border: var(--border-w) solid var(--panel-border);
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    padding: 0;
+    line-height: 1;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .rtp-arrow:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .game-card-row {
+    margin-bottom: 14px;
+  }
+
+  .game-card-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .game-card-row label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .game-card-row .wager-input-row input {
+    padding: 12px 14px 12px 28px;
+    font-size: 15px;
+  }
+
+  .game-type-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  .game-type-btn {
+    flex: 1;
+    background: var(--input-bg);
+    border: var(--border-w) solid var(--panel-border);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 6px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+
+  .game-type-btn:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .game-type-btn.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .game-type-btn.active.debt {
+    background: var(--debt-soft);
+    border-color: var(--debt);
+    color: var(--debt);
+  }
+
+  .game-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .game-profit {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: var(--border-w) solid var(--panel-border);
+  }
+
+  .game-profit.pos {
+    color: var(--accent);
+  }
+
+  .game-profit.neg {
+    color: var(--debt);
+  }
+
+  .compare-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .compare-actions button {
+    background: var(--panel);
+    border: var(--border-w) solid var(--panel-border);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 9px 14px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .compare-actions button:hover:not(:disabled) {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .compare-actions button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .compare-actions select {
+    background: var(--panel);
+    border: var(--border-w) solid var(--panel-border);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  .compare-actions .game-count {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+
+  .chart-panel {
+    background: var(--panel-bg);
+    background-image: var(--panel-sheen);
+    backdrop-filter: var(--panel-blur);
+    -webkit-backdrop-filter: var(--panel-blur);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .chart-panel h3 {
+    font-size: 14px;
+    font-family: var(--font-mono);
+    color: var(--text-dim);
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .keypad {
+    display: none;
+    background: var(--panel);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .keypad.visible {
+    display: block;
+  }
+
+  .keypad-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .keypad-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .keypad-btn {
+    flex: 1;
+    background: var(--input-bg);
+    border: var(--border-w) solid var(--panel-border);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 8px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s;
+    text-align: center;
+  }
+
+  .keypad-btn:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+    background: var(--accent-softer);
+  }
+
+  .keypad-btn:active {
+    background: var(--accent-ring);
+    transform: scale(0.96);
+  }
+
+  .keypad-back,
+  .keypad-hide {
+    color: var(--debt);
+  }
+
+  .keypad-back:hover,
+  .keypad-hide:hover {
+    border-color: var(--debt-dim);
+    color: var(--debt);
+  }
+
+  .chart-svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .chart-bar {
+    transition: fill 0.2s;
+  }
+
+  .chart-bar:hover {
+    filter: brightness(1.2);
+  }
+
+  .chart-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    fill: var(--text-dim);
+  }
+
+  .chart-axis {
+    stroke: var(--panel-border);
+    stroke-width: 1;
+  }
+
+  .chart-zero-line {
+    stroke: var(--text-dim);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+  }
+
+  .chart-tooltip {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--text);
+  }
+
+  .chart-value {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--text-dim);
+  }
+
+  /* ==========================================================================
+     FAMILIES
+
+     Structure only — radii, border weight, fonts, material. Each family
+     restyles tokens the mode knobs never touch, so all six work against every
+     palette in both light and dark without compound selectors.
+     ========================================================================== */
+
+  /* --- Terminal: monospace, square, phosphor glow, CRT scanlines --- */
+  [data-family="terminal"] {
+    --font-sans: var(--font-mono);
+    --radius-lg: 0px;
+    --radius-md: 0px;
+    --radius-sm: 0px;
+    --radius-xs: 0px;
+    --radius-pill: 0px;
+    --radius-round: 0px;
+    --panel: color-mix(in oklab, var(--panel-base), var(--bg) 60%);
+    --panel-border: color-mix(in oklab, var(--bg), var(--accent) 32%);
+    --input-bg: color-mix(in oklab, var(--bg), var(--fg) 5%);
+    --accent-glow: 0 0 14px color-mix(in srgb, var(--accent) 55%, transparent);
+    --result-bg: none;
+    --result-debt-bg: none;
+    --shadow: none;
+    --page-texture: repeating-linear-gradient(to bottom, rgba(0,0,0,0.24) 0 1px, transparent 1px 3px);
+    --page-texture-opacity: 0.6;
+  }
+
+  [data-family="terminal"] h1 { font-weight: 600; letter-spacing: 0; }
+
+  [data-family="terminal"] h1::after {
+    content: '_';
+    color: var(--accent);
+    margin-left: 4px;
+    animation: term-blink 1.1s steps(1) infinite;
+  }
+
+  [data-family="terminal"] label,
+  [data-family="terminal"] .game-card-row label { text-transform: uppercase; letter-spacing: 0.06em; }
+
+  [data-family="terminal"] input.result-value,
+  [data-family="terminal"] .eyebrow { text-shadow: var(--accent-glow); }
+
+  [data-family="terminal"] .eyebrow::before { box-shadow: 0 0 10px var(--accent); }
+
+  [data-family="terminal"] .result-panel { border-style: dashed; }
+
+  @keyframes term-blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+  /* --- Liquid Glass: translucent, blurred, specular highlight --- */
+  [data-family="glass"] {
+    --radius-lg: 26px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+    --radius-xs: 9px;
+    --panel: color-mix(in srgb, var(--panel-base) 42%, transparent);
+    --panel-blur: blur(26px) saturate(1.7);
+    --panel-sheen: linear-gradient(155deg, color-mix(in srgb, #fff 18%, transparent), transparent 46%);
+    --panel-border: color-mix(in srgb, #fff 24%, transparent);
+    --input-bg: color-mix(in srgb, var(--fg) 9%, transparent);
+    --shadow: 0 14px 38px var(--shade), inset 0 1px 0 color-mix(in srgb, #fff 24%, transparent);
+    --result-bg: linear-gradient(160deg, color-mix(in srgb, var(--accent) 28%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));
+    --result-debt-bg: linear-gradient(160deg, color-mix(in srgb, var(--debt) 28%, transparent), color-mix(in srgb, var(--debt) 5%, transparent));
+  }
+
+  /* On a light page a white hairline disappears — switch to an ink hairline. */
+  [data-mode="light"][data-family="glass"] {
+    --panel-border: color-mix(in srgb, var(--fg) 14%, transparent);
+    --panel-sheen: linear-gradient(155deg, color-mix(in srgb, #fff 55%, transparent), transparent 46%);
+  }
+
+  /* Blur needs something worth blurring behind it. */
+  [data-family="glass"] body {
+    background-image:
+      radial-gradient(circle at 12% 6%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 45%),
+      radial-gradient(circle at 88% 14%, color-mix(in srgb, var(--debt) 32%, transparent), transparent 45%),
+      radial-gradient(circle at 62% 96%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  [data-family="glass"] .arrow-flow .step,
+  [data-family="glass"] .rtp-text-input { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+  /* --- Material You: tonal surfaces, generous radii, pill controls --- */
+  [data-family="material"] {
+    --font-sans: 'Google Sans', 'Product Sans', Roboto, system-ui, -apple-system, sans-serif;
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 14px;
+    --radius-xs: 10px;
+    --border-w: 0px;
+    --panel: color-mix(in oklab, var(--panel-base), var(--accent) 9%);
+    --input-bg: color-mix(in oklab, var(--input-base), var(--accent) 16%);
+    --panel-border: transparent;
+    --shadow: 0 1px 3px var(--shade-weak), 0 6px 16px var(--shade-weak);
+    --result-bg: color-mix(in oklab, var(--bg), var(--accent) 20%);
+    --result-debt-bg: color-mix(in oklab, var(--bg), var(--debt) 20%);
+    --track: color-mix(in oklab, var(--bg), var(--fg) 18%);
+  }
+
+  /* Outlines are the one thing a borderless family gives up, so the chips that
+     relied on them get a tonal fill instead. */
+  [data-family="material"] .result-hint,
+  [data-family="material"] .arrow-flow .step {
+    background: color-mix(in oklab, var(--bg), var(--fg) 10%);
+    padding: 2px 7px;
+  }
+
+  /* Borderless surfaces still need the internal rules, so put them back as
+     tonal dividers rather than leaning on --border-w. */
+  [data-family="material"] .breakdown,
+  [data-family="material"] .arrow-flow,
+  [data-family="material"] .game-profit {
+    border-top: 1px solid color-mix(in oklab, var(--bg), var(--fg) 14%);
+  }
+
+  [data-family="material"] .dice-btn,
+  [data-family="material"] .preset-btn,
+  [data-family="material"] .tab-btn,
+  [data-family="material"] .game-type-btn,
+  [data-family="material"] .keypad-btn,
+  [data-family="material"] .compare-actions button,
+  [data-family="material"] .compare-actions select { border-radius: var(--radius-pill); }
+
+  [data-family="material"] .dice-btn:hover,
+  [data-family="material"] .preset-btn:hover,
+  [data-family="material"] .tab-btn:hover,
+  [data-family="material"] .keypad-btn:hover {
+    background: color-mix(in oklab, var(--input-bg), var(--accent) 18%);
+  }
+
+  /* --- Neo-Brutalist: 2px ink borders, hard offset shadows --- */
+  [data-family="brutalist"] {
+    --font-sans: 'Archivo Black', 'Arial Black', Impact, system-ui, sans-serif;
+    --radius-lg: 0px;
+    --radius-md: 0px;
+    --radius-sm: 0px;
+    --radius-xs: 0px;
+    --radius-pill: 0px;
+    --radius-round: 0px;
+    --border-w: 2px;
+    --panel-border: var(--fg);
+    --shadow: 5px 5px 0 var(--fg);
+    --result-bg: color-mix(in oklab, var(--bg), var(--accent) 18%);
+    --result-debt-bg: color-mix(in oklab, var(--bg), var(--debt) 18%);
+  }
+
+  [data-family="brutalist"] h1,
+  [data-family="brutalist"] .compare-col-header { text-transform: uppercase; letter-spacing: -0.02em; }
+
+  [data-family="brutalist"] .result-panel { border-color: var(--fg); box-shadow: 6px 6px 0 var(--accent); }
+  [data-family="brutalist"] .result-panel.has-debt { box-shadow: 6px 6px 0 var(--debt); }
+
+  [data-family="brutalist"] .dice-btn,
+  [data-family="brutalist"] .preset-btn,
+  [data-family="brutalist"] .tab-btn,
+  [data-family="brutalist"] .keypad-btn,
+  [data-family="brutalist"] .compare-actions button { box-shadow: 3px 3px 0 var(--fg); font-weight: 700; }
+
+  [data-family="brutalist"] .dice-btn:active,
+  [data-family="brutalist"] .preset-btn:active,
+  [data-family="brutalist"] .tab-btn:active,
+  [data-family="brutalist"] .keypad-btn:active { box-shadow: 0 0 0 var(--fg); transform: translate(3px, 3px); }
+
+  /* --- Paper: serif, hairlines, print-like, no fills --- */
+  [data-family="paper"] {
+    --font-sans: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    --font-mono: 'Courier New', ui-monospace, monospace;
+    --radius-lg: 3px;
+    --radius-md: 2px;
+    --radius-sm: 2px;
+    --radius-xs: 2px;
+    --radius-pill: 2px;
+    --panel: transparent;
+    --panel-border: color-mix(in oklab, var(--bg), var(--fg) 28%);
+    --input-bg: color-mix(in oklab, var(--bg), var(--fg) 5%);
+    --shadow: none;
+    --result-bg: none;
+    --result-debt-bg: none;
+    --page-texture: radial-gradient(circle, color-mix(in srgb, var(--fg) 9%, transparent) 0 1px, transparent 1px);
+    --page-texture-size: 5px 5px;
+    --page-texture-opacity: 0.5;
+  }
+
+  [data-family="paper"] h1 { font-weight: 600; }
+  [data-family="paper"] .eyebrow { letter-spacing: 0.26em; }
+  [data-family="paper"] .result-panel { border-width: 1px 0; }
+  [data-family="paper"] input.result-value { font-family: var(--font-sans); }
+
+  /* ==========================================================================
+     THEME PICKER
+     ========================================================================== */
+  .theme-bar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+
+  .theme-open {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-bg);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 7px 13px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .theme-open:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+  .theme-open svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  .theme-swatch-mini {
+    width: 26px;
+    height: 12px;
+    border-radius: var(--radius-xs);
+    flex-shrink: 0;
+    background: linear-gradient(90deg, var(--accent) 0 50%, var(--debt) 50% 100%);
+  }
+
+  .theme-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 50;
+    width: min(400px, calc(100vw - 40px));
+    max-height: min(70vh, 640px);
+    overflow-y: auto;
+    background: var(--panel-bg);
+    background-image: var(--panel-sheen);
+    backdrop-filter: var(--panel-blur);
+    -webkit-backdrop-filter: var(--panel-blur);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 18px;
+    text-align: left;
+  }
+
+  .theme-menu[hidden] { display: none; }
+
+  .theme-menu h4 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+    margin: 0 0 10px;
+  }
+
+  .theme-menu-section + .theme-menu-section { margin-top: 20px; }
+
+  .fam-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .fam-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    background: var(--input-bg);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-md);
+    padding: 9px 10px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+
+  .fam-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+  .fam-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .fam-btn .fam-name {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    display: block;
+  }
+
+  .fam-btn .fam-desc {
+    font-size: 9.5px;
+    color: var(--muted-text);
+    display: block;
+    margin-top: 2px;
+    line-height: 1.35;
+  }
+
+  /* Each chip previews its family's silhouette: corner radius, border weight,
+     fill treatment. Cheaper and clearer than rendering a live mini-calculator. */
+  .fam-chip {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    background: var(--panel);
+    border: 1px solid var(--text-dim);
+  }
+
+  .fam-chip[data-fam="studio"]    { border-radius: 7px; }
+  .fam-chip[data-fam="terminal"]  { border-radius: 0; border-style: solid; background: repeating-linear-gradient(to bottom, currentColor 0 1px, transparent 1px 3px); }
+  .fam-chip[data-fam="glass"]     { border-radius: 11px; background: linear-gradient(150deg, color-mix(in srgb, currentColor 45%, transparent), transparent 60%); }
+  .fam-chip[data-fam="material"]  { border-radius: 13px; border-color: transparent; background: color-mix(in srgb, currentColor 30%, transparent); }
+  .fam-chip[data-fam="brutalist"] { border-radius: 0; border-width: 2px; box-shadow: 3px 3px 0 currentColor; }
+  .fam-chip[data-fam="paper"]     { border-radius: 2px; border-width: 1px 0; }
+
+  .pal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .pal-btn {
+    background: transparent;
+    border: var(--border-w) solid transparent;
+    border-radius: var(--radius-md);
+    padding: 5px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .pal-btn:hover { border-color: var(--accent-dim); }
+  .pal-btn.active { border-color: var(--accent); }
+
+  .pal-swatch {
+    height: 30px;
+    border-radius: var(--radius-sm);
+    border: 1px solid color-mix(in oklab, var(--bg), var(--fg) 20%);
+    background: var(--sw-bg);
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    padding: 4px;
+    overflow: hidden;
+  }
+
+  .pal-swatch i {
+    display: block;
+    flex: 1;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .pal-swatch i:nth-child(1) { background: var(--sw-a); }
+  .pal-swatch i:nth-child(2) { background: var(--sw-d); }
+  .pal-swatch i:nth-child(3) { background: var(--sw-fg); flex: 0 0 5px; }
+
+  .pal-name {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+    margin-top: 5px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pal-btn.active .pal-name { color: var(--accent); }
+
+  .theme-menu-foot {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: var(--border-w) solid var(--panel-border);
+  }
+
+  .theme-menu-foot button {
+    flex: 1;
+    background: var(--input-bg);
+    border: var(--border-w) solid var(--panel-border);
+    border-radius: var(--radius-md);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .theme-menu-foot button:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+  @media (max-width: 560px) {
+    .theme-open span.theme-open-label { display: none; }
+    .pal-grid { grid-template-columns: repeat(2, 1fr); }
+    .fam-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ==========================================================================
+     THEME TRANSITION
+     A circular reveal from the control that was clicked. Uses the View
+     Transitions API where available; script falls back to an overlay wipe.
+     ========================================================================== */
+  @keyframes vt-expand {
+    from { clip-path: circle(0% at var(--toggle-x, 50%) var(--toggle-y, 50%)); }
+    to   { clip-path: circle(150% at var(--toggle-x, 50%) var(--toggle-y, 50%)); }
+  }
+
+  ::view-transition-image-pair(root) { mix-blend-mode: normal; }
+  ::view-transition-old(root) { animation: none; }
+  ::view-transition-new(root) { animation: vt-expand 0.55s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
 </style>
+
+<script>
+  /* Theme engine: family × palette × mode.
+     Runs in <head> so a stored theme is on <html> before first paint — the
+     picker UI in the body script only drives what is set up here. Palette CSS
+     is generated from this one table, so the rules on the page and the
+     swatches in the picker can never drift apart. */
+  (function () {
+    const FAMILIES = [
+      { id: 'studio',    name: 'Studio',       desc: 'Soft panels, quiet borders' },
+      { id: 'terminal',  name: 'Terminal',     desc: 'Mono, scanlines, phosphor' },
+      { id: 'glass',     name: 'Liquid Glass', desc: 'Blurred, translucent, specular' },
+      { id: 'material',  name: 'Material You', desc: 'Tonal fills, big radii' },
+      { id: 'brutalist', name: 'Brutalist',    desc: 'Ink borders, hard shadows' },
+      { id: 'paper',     name: 'Paper',        desc: 'Serif, hairlines, print' }
+    ];
+
+    // Four seeds per mode — bg, fg, accent, debt. Everything else is mixed
+    // from them in CSS, which is why a new palette is two lines.
+    const PALETTES = [
+      { id: 'emerald', name: 'Emerald',
+        dark:  { bg: '#0b0d10', fg: '#eef1f5', accent: '#3ddc97', debt: '#ff6b6b' },
+        light: { bg: '#f4f5f7', fg: '#12151a', accent: '#17976a', debt: '#d9433d' } },
+      { id: 'amber', name: 'Amber',
+        dark:  { bg: '#100c07', fg: '#f6efe4', accent: '#ffb454', debt: '#ff5f5f' },
+        light: { bg: '#faf5ec', fg: '#1c1509', accent: '#b56a00', debt: '#c8402f' } },
+      { id: 'ice', name: 'Ice',
+        dark:  { bg: '#080e12', fg: '#e6f4fa', accent: '#4dd0e1', debt: '#ff7a8a' },
+        light: { bg: '#f0f6f9', fg: '#0d1a20', accent: '#00778c', debt: '#cf3b52' } },
+      { id: 'violet', name: 'Violet',
+        dark:  { bg: '#0d0a14', fg: '#efe9fb', accent: '#a78bfa', debt: '#fb7185' },
+        light: { bg: '#f6f4fc', fg: '#170f24', accent: '#6d40d8', debt: '#d3405c' } },
+      { id: 'rose', name: 'Rose',
+        dark:  { bg: '#120a0d', fg: '#fbeaf0', accent: '#fb7fa8', debt: '#ff5252' },
+        light: { bg: '#fdf3f6', fg: '#210f16', accent: '#c2185b', debt: '#c62828' } },
+      { id: 'gold', name: 'Casino Gold',
+        dark:  { bg: '#0a0f0b', fg: '#f4f1e4', accent: '#e3c26a', debt: '#e05c5c' },
+        light: { bg: '#f7f4ea', fg: '#171a12', accent: '#8a6a12', debt: '#b23b3b' } },
+      { id: 'phosphor', name: 'Phosphor',
+        dark:  { bg: '#020602', fg: '#c9f7cf', accent: '#33ff66', debt: '#ff4d4d' },
+        light: { bg: '#eaf3ea', fg: '#04140a', accent: '#0a7d2b', debt: '#b81f1f' } },
+      { id: 'nord', name: 'Nord',
+        dark:  { bg: '#2e3440', fg: '#eceff4', accent: '#88c0d0', debt: '#bf616a' },
+        light: { bg: '#eceff4', fg: '#2e3440', accent: '#5e81ac', debt: '#bf616a' } },
+      { id: 'dracula', name: 'Dracula',
+        dark:  { bg: '#282a36', fg: '#f8f8f2', accent: '#50fa7b', debt: '#ff5555' },
+        light: { bg: '#f5f4ee', fg: '#1f1f28', accent: '#14710a', debt: '#cb3a2a' } },
+      { id: 'gruvbox', name: 'Gruvbox',
+        dark:  { bg: '#282828', fg: '#ebdbb2', accent: '#b8bb26', debt: '#fb4934' },
+        light: { bg: '#fbf1c7', fg: '#3c3836', accent: '#79740e', debt: '#9d0006' } },
+      { id: 'tokyo', name: 'Tokyo Night',
+        dark:  { bg: '#1a1b26', fg: '#c0caf5', accent: '#7aa2f7', debt: '#f7768e' },
+        light: { bg: '#e6e7ed', fg: '#343b58', accent: '#34548a', debt: '#8c4351' } },
+      { id: 'catppuccin', name: 'Catppuccin',
+        dark:  { bg: '#1e1e2e', fg: '#cdd6f4', accent: '#a6e3a1', debt: '#f38ba8' },
+        light: { bg: '#eff1f5', fg: '#4c4f69', accent: '#40a02b', debt: '#d20f39' } },
+      { id: 'solarized', name: 'Solarized',
+        dark:  { bg: '#002b36', fg: '#eee8d5', accent: '#2aa198', debt: '#dc322f' },
+        light: { bg: '#fdf6e3', fg: '#073642', accent: '#197f78', debt: '#dc322f' } },
+      { id: 'slate', name: 'Slate',
+        dark:  { bg: '#0f1319', fg: '#e7ecf3', accent: '#7dd3fc', debt: '#f87171' },
+        light: { bg: '#f1f4f8', fg: '#0f1620', accent: '#0369a1', debt: '#dc2626' } },
+      { id: 'graphite', name: 'Graphite',
+        dark:  { bg: '#0a0a0a', fg: '#fafafa', accent: '#e5e5e5', debt: '#ef4444' },
+        light: { bg: '#fafafa', fg: '#0a0a0a', accent: '#171717', debt: '#b91c1c' } }
+    ];
+
+    const KEY = 'stakeCalc.theme';
+    const seeds = (p, mode) =>
+      `--bg:${p[mode].bg};--fg:${p[mode].fg};--accent:${p[mode].accent};--debt:${p[mode].debt}`;
+
+    const style = document.createElement('style');
+    style.id = 'paletteStyles';
+    style.textContent = PALETTES.map(p =>
+      `[data-palette="${p.id}"]{${seeds(p, 'dark')}}\n` +
+      `[data-mode="light"][data-palette="${p.id}"]{${seeds(p, 'light')}}`
+    ).join('\n');
+    document.head.appendChild(style);
+
+    function osMode() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+        ? 'light' : 'dark';
+    }
+
+    const state = { family: 'studio', palette: 'emerald', mode: osMode() };
+    try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+    if (!FAMILIES.some(f => f.id === state.family)) state.family = 'studio';
+    if (!PALETTES.some(p => p.id === state.palette)) state.palette = 'emerald';
+    if (state.mode !== 'light' && state.mode !== 'dark') state.mode = osMode();
+
+    function apply() {
+      const r = document.documentElement;
+      r.setAttribute('data-family', state.family);
+      r.setAttribute('data-palette', state.palette);
+      r.setAttribute('data-mode', state.mode);
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    }
+    apply();
+
+    window.ThemeEngine = {
+      FAMILIES: FAMILIES, PALETTES: PALETTES, state: state, apply: apply, osMode: osMode,
+      palette: function (id) { return PALETTES.find(function (p) { return p.id === id; }) || PALETTES[0]; },
+      family: function (id) { return FAMILIES.find(function (f) { return f.id === id; }) || FAMILIES[0]; }
+    };
+  })();
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -596,21 +1646,50 @@
       <div class="eyebrow">Stake Engine · Payout Model</div>
       <h1>Payout Calculator</h1>
     </div>
-    <div class="theme-toggle" role="group" aria-label="Theme">
-      <button type="button" id="darkModeBtn" class="active" title="Dark mode" aria-label="Dark mode">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
+    <div class="theme-bar">
+      <button type="button" class="theme-open" id="themeMenuBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="themeMenu" title="Change theme">
+        <span class="theme-swatch-mini" aria-hidden="true"></span>
+        <span class="theme-open-label" id="themeLabel">Studio · Emerald</span>
       </button>
-      <button type="button" id="lightModeBtn" title="Light mode" aria-label="Light mode">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
-        </svg>
-      </button>
+
+      <div class="theme-toggle" role="group" aria-label="Colour mode">
+        <button type="button" id="darkModeBtn" class="active" title="Dark mode" aria-label="Dark mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <button type="button" id="lightModeBtn" title="Light mode" aria-label="Light mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="theme-menu" id="themeMenu" role="dialog" aria-label="Theme picker" hidden>
+        <div class="theme-menu-section">
+          <h4>Style</h4>
+          <div class="fam-grid" id="familyGrid"></div>
+        </div>
+        <div class="theme-menu-section">
+          <h4>Palette</h4>
+          <div class="pal-grid" id="paletteGrid"></div>
+        </div>
+        <div class="theme-menu-foot">
+          <button type="button" id="themeRandomBtn">Surprise me</button>
+          <button type="button" id="themeResetBtn">Reset</button>
+        </div>
+      </div>
     </div>
   </div>
   <p class="sub">Compare the 7.5% Guaranteed model side by side with the 10% GGR revenue share.</p>
+
+  <div class="tab-nav" role="tablist" aria-label="Calculator modes">
+    <button type="button" class="tab-btn active" id="tabCalculator" role="tab" aria-selected="true" aria-controls="calculatorPanel">Calculator</button>
+    <button type="button" class="tab-btn" id="tabCompare" role="tab" aria-selected="false" aria-controls="comparePanel">Compare</button>
+  </div>
+
+  <div id="calculatorPanel" class="tab-panel active" role="tabpanel" aria-labelledby="tabCalculator">
 
   <div class="panel">
     <div class="field">
@@ -638,6 +1717,7 @@
         <button type="button" class="preset-btn" data-amount="2500000">$2.5M</button>
         <button type="button" class="preset-btn" data-amount="5000000">$5M</button>
       </div>
+      <div class="cap-warning" id="capWarning" style="visibility:hidden;">Max wager cap of $100B reached</div>
     </div>
   </div>
 
@@ -652,12 +1732,12 @@
           <label>
             <span>Game RTP</span>
             <span class="rtp-value-row">
-              <input type="text" class="rtp-text-input" id="rtpText75" value="96.0" inputmode="decimal">
+              <input type="text" class="rtp-text-input" id="rtpText75" value="96.70" inputmode="decimal">
               <span class="rtp-pct-suffix">%</span>
             </span>
           </label>
-          <input type="range" id="rtpSlider75" min="90" max="96" step="0.1" value="96">
-          <div class="rtp-scale"><span>90%</span><span>92%</span><span>94%</span><span>96%</span></div>
+          <input type="range" id="rtpSlider75" min="90" max="96.70" step="0.01" value="96.70">
+          <div class="rtp-scale"><span>90%</span><span>92%</span><span>94%</span><span>96.70%</span></div>
           <div style="display:flex; justify-content:flex-end; margin-top:10px; visibility:hidden;">
             <button type="button" class="dice-btn small" tabindex="-1" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -669,9 +1749,9 @@
       </div>
 
       <div class="result-panel" id="resultPanel75">
-        <div class="result-label">You receive</div>
-        <div class="result-value" id="resultValue75">$0.00</div>
-        <div class="result-note">Guaranteed, regardless of actual player outcomes.</div>
+        <div class="result-label">You receive <span class="result-hint">editable</span></div>
+        <input type="text" class="result-value" id="resultValue75" value="$0.00" inputmode="numeric" aria-label="Payout for the 7.5% guaranteed model — type an amount to back-calculate the total wagered">
+        <div class="result-note">Guaranteed, regardless of actual player outcomes. Type a payout here to back-solve the wager.</div>
 
         <div class="arrow-flow">
           <span class="step" id="flowWager75">$1,000,000</span>
@@ -740,8 +1820,8 @@
       </div>
 
       <div class="result-panel" id="resultPanel10">
-        <div class="result-label" id="resultLabel10">You receive</div>
-        <div class="result-value" id="resultValue10">$0.00</div>
+        <div class="result-label"><span id="resultLabel10">You receive</span><span class="result-hint" id="resultHint10">editable</span></div>
+        <input type="text" class="result-value" id="resultValue10" value="$0.00" inputmode="numeric" aria-label="Payout for the 10% GGR model — type an amount to back-calculate the total wagered">
         <div class="result-note" id="resultNote10">Based on this period's actual GGR.</div>
 
         <div class="arrow-flow">
@@ -771,11 +1851,59 @@
 
   </div>
 
+  </div>
+
+  <div id="comparePanel" class="tab-panel" role="tabpanel" aria-labelledby="tabCompare">
+    <div class="compare-actions">
+      <button type="button" id="addGameBtn">+ Add Game</button>
+      <span class="game-count" id="gameCount">2 / 6 games</span>
+    </div>
+
+    <div class="compare-games" id="compareGames"></div>
+
+    <div class="keypad" id="keypad">
+      <div class="keypad-row">
+        <button type="button" class="keypad-btn" data-value="7">7</button>
+        <button type="button" class="keypad-btn" data-value="8">8</button>
+        <button type="button" class="keypad-btn" data-value="9">9</button>
+      </div>
+      <div class="keypad-row">
+        <button type="button" class="keypad-btn" data-value="4">4</button>
+        <button type="button" class="keypad-btn" data-value="5">5</button>
+        <button type="button" class="keypad-btn" data-value="6">6</button>
+      </div>
+      <div class="keypad-row">
+        <button type="button" class="keypad-btn" data-value="1">1</button>
+        <button type="button" class="keypad-btn" data-value="2">2</button>
+        <button type="button" class="keypad-btn" data-value="3">3</button>
+      </div>
+      <div class="keypad-row">
+        <button type="button" class="keypad-btn" data-value="0">0</button>
+        <button type="button" class="keypad-btn" data-value="00">00</button>
+        <button type="button" class="keypad-btn" data-value="000">000</button>
+      </div>
+      <div class="keypad-row">
+        <button type="button" class="keypad-btn" data-value=".">.</button>
+        <button type="button" class="keypad-btn keypad-back" data-value="back">⌫</button>
+        <button type="button" class="keypad-btn keypad-hide" data-value="hide">✕</button>
+      </div>
+    </div>
+
+    <div class="chart-panel">
+      <h3>Profit / Loss comparison</h3>
+      <div id="chartContainer"></div>
+    </div>
+  </div>
+
   <footer>Illustrative estimate only — you never owe Stake money out of pocket · <a href="https://github.com/laghab" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">Created by laghab</a></footer>
 </div>
 
 <script>
+  const MAX_WAGER = 100_000_000_000;
+  const COMPARE_MAX_WAGER = 100_000_000_000;
+
   const wagerInput = document.getElementById('wagerInput');
+  const capWarning = document.getElementById('capWarning');
   const presetRow = document.getElementById('presetRow');
   const appendZerosBtn = document.getElementById('appendZerosBtn');
 
@@ -787,6 +1915,7 @@
 
   const resultPanel10 = document.getElementById('resultPanel10');
   const resultLabel10 = document.getElementById('resultLabel10');
+  const resultHint10 = document.getElementById('resultHint10');
   const resultValue10 = document.getElementById('resultValue10');
   const resultNote10 = document.getElementById('resultNote10');
   const ggrOut10 = document.getElementById('ggrOut10');
@@ -805,7 +1934,9 @@
   const flowGross75 = document.getElementById('flowGross75');
 
   function parseNum(str) {
-    const n = parseFloat(String(str).replace(/,/g, ''));
+    // Strips separators plus any currency chrome ($, the U+2212 minus used in
+    // debt figures) so a formatted payout can be read straight back in.
+    const n = parseFloat(String(str).replace(/[^0-9.-]/g, ''));
     return isNaN(n) ? 0 : n;
   }
 
@@ -819,7 +1950,8 @@
   }
 
   function sanitizeInputOnBlur(el) {
-    const n = parseNum(el.value);
+    let n = parseNum(el.value);
+    if (el === wagerInput) n = Math.min(n, MAX_WAGER);
     el.value = formatInt(n);
   }
 
@@ -892,13 +2024,14 @@
     const max = parseFloat(targetSlider.max);
     const clamped = Math.max(min, Math.min(max, value));
     targetSlider.value = clamped;
-    targetText.value = clamped.toFixed(1);
+    targetText.value = clamped.toFixed(targetSlider === rtpSlider75 ? 2 : 1);
   }
 
   // Keep slider <-> text input in sync for a given pair
   function bindRtpControls(slider, text, min, max) {
+    const decimals = slider === rtpSlider75 ? 2 : 1;
     slider.addEventListener('input', () => {
-      text.value = parseFloat(slider.value).toFixed(1);
+      text.value = parseFloat(slider.value).toFixed(decimals);
       propagateLinkedRtp(slider, parseFloat(slider.value));
       recalc();
     });
@@ -911,14 +2044,14 @@
       let v = parseFloat(text.value);
       if (isNaN(v)) v = parseFloat(slider.value);
       v = Math.max(min, Math.min(max, v));
-      text.value = v.toFixed(1);
+      text.value = v.toFixed(decimals);
       slider.value = v;
       propagateLinkedRtp(slider, v);
       recalc();
     });
   }
 
-  bindRtpControls(rtpSlider75, rtpText75, 90, 96);
+  bindRtpControls(rtpSlider75, rtpText75, 90, 96.70);
   bindRtpControls(rtpSlider10, rtpText10, 75, 120);
 
   rtpLinkBtn.addEventListener('click', () => {
@@ -934,11 +2067,15 @@
     }
   });
 
+  function clampWager(n) {
+    return Math.min(n, MAX_WAGER);
+  }
+
   presetRow.addEventListener('click', (e) => {
     const btn = e.target.closest('.preset-btn');
     if (!btn) return;
-    wagerInput.value = formatInt(parseNum(btn.dataset.amount));
-    recalc();
+    wagerInput.value = formatInt(clampWager(parseNum(btn.dataset.amount)));
+    recalcFromWager();
   });
 
   function currentRtp75() {
@@ -951,6 +2088,51 @@
     return isNaN(fromText) ? parseFloat(rtpSlider10.value) : fromText;
   }
 
+  // --- Bidirectional payout <-> wager sync ---
+  // The wager and the two payout figures are three views of one number.
+  // Whichever field was edited last stays pinned and the other two are derived
+  // from it, so moving an RTP slider re-solves the wager instead of overwriting
+  // the payout the user just typed.
+  let payoutSource = 'wager'; // 'wager' | 'payout75' | 'payout10'
+
+  function wagerFromPayout(payout, rtp, rate) {
+    const edge = (100 - rtp) / 100;
+    if (edge <= 0) return null;
+    return Math.min(payout / (rate * edge), MAX_WAGER);
+  }
+
+  function pullWagerFromPayout() {
+    if (payoutSource === 'wager') return;
+    const isFixed75 = payoutSource === 'payout75';
+    const payout = parseNum(isFixed75 ? resultValue75.value : resultValue10.value);
+    if (payout <= 0) return;
+    const wager = wagerFromPayout(
+      payout,
+      isFixed75 ? currentRtp75() : currentRtp10(),
+      isFixed75 ? 0.075 : 0.10
+    );
+    if (wager === null) return;
+    wagerInput.value = formatInt(wager);
+  }
+
+  // Never rewrite the field the user is typing in — only the derived one.
+  function setPayoutField(el, value) {
+    if (document.activeElement === el) return;
+    el.value = formatMoney(value);
+  }
+
+  function bindPayoutField(el, source) {
+    el.addEventListener('input', () => {
+      if (el.readOnly) return;
+      payoutSource = source;
+      recalc();
+    });
+    el.addEventListener('blur', recalc);
+  }
+
+  bindPayoutField(resultValue75, 'payout75');
+  bindPayoutField(resultValue10, 'payout10');
+
   function recalcFixed75() {
     const rtp = currentRtp75();
     const edge = 100 - rtp;
@@ -959,10 +2141,10 @@
     const ggr = wager * (edge / 100);
     const gross = ggr * 0.075;
 
-    resultValue75.textContent = formatMoney(gross);
+    setPayoutField(resultValue75, gross);
 
     flowWager75.textContent = '$' + formatInt(wager);
-    flowEdge75.textContent = edge.toFixed(1) + '% edge';
+    flowEdge75.textContent = edge.toFixed(2) + '% edge';
     flowGGR75.textContent = formatMoney(ggr) + ' GGR';
     flowGross75.textContent = formatMoney(gross);
     ggrOut75.textContent = formatMoney(ggr);
@@ -991,17 +2173,24 @@
     grossOut10.classList.toggle('neg', periodShare < 0);
 
     if (periodShare < 0) {
+      // A debt can't be back-solved into a wager — the house edge is negative,
+      // so every wager produces a loss. Lock the field rather than accept an
+      // amount that has no valid inverse.
       resultPanel10.classList.add('has-debt');
       resultLabel10.textContent = 'Carried-forward debt';
-      resultValue10.textContent = formatMoney(Math.abs(periodShare));
+      resultValue10.value = formatMoney(Math.abs(periodShare));
+      resultValue10.readOnly = true;
       resultValue10.classList.add('debt-active');
+      resultHint10.style.display = 'none';
       resultNote10.textContent = 'Negative GGR this period. No payout — the balance carries forward, and you never owe Stake money out of pocket.';
     } else {
       resultPanel10.classList.remove('has-debt');
       resultLabel10.textContent = 'You receive';
-      resultValue10.textContent = formatMoney(periodShare);
+      resultValue10.readOnly = false;
+      setPayoutField(resultValue10, periodShare);
       resultValue10.classList.remove('debt-active');
-      resultNote10.textContent = 'Based on this period\'s actual GGR.';
+      resultHint10.style.display = '';
+      resultNote10.textContent = 'Based on this period\'s actual GGR. Type a payout here to back-solve the wager.';
     }
 
     return periodShare;
@@ -1010,23 +2199,34 @@
 
 
   function recalc() {
+    pullWagerFromPayout();
     syncPresetHighlight();
     recalcFixed75();
     recalcGGR10();
+    const currentWager = parseNum(wagerInput.value);
+    capWarning.style.visibility = currentWager >= MAX_WAGER ? 'visible' : 'hidden';
   }
 
-  wagerInput.addEventListener('input', recalc);
-  wagerInput.addEventListener('blur', () => { sanitizeInputOnBlur(wagerInput); recalc(); });
+  // Recalculate with the wager as the source of truth, dropping whichever
+  // payout field was previously pinned.
+  function recalcFromWager() {
+    payoutSource = 'wager';
+    recalc();
+  }
+
+  wagerInput.addEventListener('input', recalcFromWager);
+  wagerInput.addEventListener('blur', () => { sanitizeInputOnBlur(wagerInput); recalcFromWager(); });
 
   document.getElementById('wagerRandomBtn').addEventListener('click', () => {
-    wagerInput.value = formatInt(randomWager());
-    recalc();
+    wagerInput.value = formatInt(clampWager(randomWager()));
+    recalcFromWager();
   });
 
   appendZerosBtn.addEventListener('click', () => {
     const current = parseNum(wagerInput.value);
-    wagerInput.value = formatInt(current * 1000);
-    recalc();
+    const next = current === 0 ? 0 : Math.min(current * 1000, MAX_WAGER);
+    wagerInput.value = formatInt(next);
+    recalcFromWager();
   });
 
   document.getElementById('rtpRandomBtn').addEventListener('click', () => {
@@ -1040,25 +2240,581 @@
   rtpPool = generateRTPPool(RTP_POOL_SIZE);
   recalc();
 
-  // --- Theme toggle (dark / light) ---
-  const darkModeBtn = document.getElementById('darkModeBtn');
-  const lightModeBtn = document.getElementById('lightModeBtn');
+  // --- Compare mode ---
+  const tabCalculator = document.getElementById('tabCalculator');
+  const tabCompare = document.getElementById('tabCompare');
+  const calculatorPanel = document.getElementById('calculatorPanel');
+  const comparePanel = document.getElementById('comparePanel');
+  const compareGamesContainer = document.getElementById('compareGames');
+  const addGameBtn = document.getElementById('addGameBtn');
+  const chartTypeSelect = document.getElementById('chartTypeSelect');
+  const chartContainer = document.getElementById('chartContainer');
+  const gameCountEl = document.getElementById('gameCount');
 
-  function setTheme(theme) {
-    if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    darkModeBtn.classList.toggle('active', theme !== 'light');
-    lightModeBtn.classList.toggle('active', theme === 'light');
+  let compareGames = [
+    { id: 1, name: 'Game 1', wager: 1000000, type: '75', rtp: 96.70 },
+    { id: 2, name: 'Game 2', wager: 1000000, type: '10', rtp: 96.00 }
+  ];
+  let nextGameId = 3;
+
+  function switchTab(tab) {
+    const isCalc = tab === 'calculator';
+    tabCalculator.classList.toggle('active', isCalc);
+    tabCompare.classList.toggle('active', !isCalc);
+    calculatorPanel.classList.toggle('active', isCalc);
+    comparePanel.classList.toggle('active', !isCalc);
+    tabCalculator.setAttribute('aria-selected', isCalc);
+    tabCompare.setAttribute('aria-selected', !isCalc);
   }
 
-  darkModeBtn.addEventListener('click', () => setTheme('dark'));
-  lightModeBtn.addEventListener('click', () => setTheme('light'));
+  tabCalculator.addEventListener('click', () => switchTab('calculator'));
+  tabCompare.addEventListener('click', () => switchTab('compare'));
 
-  const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-  setTheme(prefersLight ? 'light' : 'dark');
+  function payoutForGame(game) {
+    const rate = game.type === '75' ? 0.075 : 0.10;
+    const edge = (100 - game.rtp) / 100;
+    return game.wager * edge * rate;
+  }
+
+  function clampRtp(type, rtp) {
+    if (type === '75') return Math.max(90, Math.min(96.70, rtp));
+    return Math.max(50, Math.min(200, rtp));
+  }
+
+  function uniqueDefaultName() {
+    let n = 1;
+    while (compareGames.some(g => g.name === `Game ${n}`)) n++;
+    return `Game ${n}`;
+  }
+
+  function addGame() {
+    if (compareGames.length >= 6) return;
+    compareGames.push({
+      id: nextGameId++,
+      name: uniqueDefaultName(),
+      wager: 1000000,
+      type: '75',
+      rtp: 96.70
+    });
+    renderCompareGames();
+  }
+
+  function removeGame(id) {
+    if (compareGames.length <= 2) return;
+    compareGames = compareGames.filter(g => g.id !== id);
+    renderCompareGames();
+  }
+
+  function duplicateGame(id) {
+    if (compareGames.length >= 6) return;
+    const source = compareGames.find(g => g.id === id);
+    if (!source) return;
+    compareGames.push({
+      id: nextGameId++,
+      name: uniqueDefaultName(),
+      wager: source.wager,
+      type: source.type,
+      rtp: source.rtp
+    });
+    renderCompareGames();
+  }
+
+  function updateGame(id, field, value) {
+    const game = compareGames.find(g => g.id === id);
+    if (!game) return null;
+    if (field === 'wager') {
+      game.wager = Math.min(parseNum(value) || 0, COMPARE_MAX_WAGER);
+    } else if (field === 'type') {
+      game.type = value;
+      game.rtp = clampRtp(value, game.rtp);
+    } else if (field === 'rtp') {
+      game.rtp = clampRtp(game.type, parseFloat(value) || 0);
+    } else if (field === 'name') {
+      game.name = value;
+    }
+    return game;
+  }
+
+  function updateProfitDisplay(card, id) {
+    const game = compareGames.find(g => g.id === id);
+    if (!game || !card) return;
+    const profit = payoutForGame(game);
+    const isDebt = profit < 0;
+    const profitEl = card.querySelector('.game-profit');
+    profitEl.className = `game-profit ${isDebt ? 'neg' : 'pos'}`;
+    profitEl.textContent = `${isDebt ? 'Loss' : 'Profit'}: ${formatMoney(Math.abs(profit))}`;
+  }
+
+  function renderCompareGames() {
+    compareGamesContainer.innerHTML = '';
+    compareGames.forEach(game => {
+      const profit = payoutForGame(game);
+      const isDebt = profit < 0;
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.innerHTML = `
+        <div class="game-card-header">
+          <input type="text" class="game-card-name" value="${escapeHtml(game.name)}" data-id="${game.id}" data-field="name">
+          <button type="button" class="game-card-dup" data-id="${game.id}" title="Duplicate">⎘</button>
+          <button type="button" class="game-card-remove" data-id="${game.id}" title="Remove">×</button>
+        </div>
+        <div class="game-card-row">
+          <label>Wagered</label>
+          <div class="wager-input-row">
+            <span class="currency-prefix">$</span>
+            <input type="text" value="${formatInt(game.wager)}" data-id="${game.id}" data-field="wager">
+            <button type="button" class="game-card-000" data-id="${game.id}" title="Append 000" style="flex-shrink:0;width:34px;height:34px;border-radius:6px;background:var(--input-bg);border:1px solid var(--panel-border);color:var(--text-dim);cursor:pointer;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;">000</button>
+          </div>
+        </div>
+        <div class="game-card-row">
+          <label>Payout type</label>
+          <div class="game-type-options">
+            <button type="button" class="game-type-btn ${game.type === '75' ? 'active' : ''}" data-id="${game.id}" data-field="type" data-value="75">7.5% Guaranteed</button>
+            <button type="button" class="game-type-btn ${game.type === '10' ? 'active debt' : ''}" data-id="${game.id}" data-field="type" data-value="10">10% GGR</button>
+          </div>
+        </div>
+        <div class="game-card-row">
+          <label>RTP (${game.type === '75' ? '90–96.70' : '50–200'})</label>
+          <div class="wager-input-row">
+            <input type="text" value="${game.rtp.toFixed(game.type === '75' ? 2 : 1)}" data-id="${game.id}" data-field="rtp" style="padding-left:12px;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);margin-left:-8px;margin-right:4px;">%</span>
+            <button type="button" class="rtp-arrow up" data-id="${game.id}" title="Increase RTP">▲</button>
+            <button type="button" class="rtp-arrow down" data-id="${game.id}" title="Decrease RTP">▼</button>
+          </div>
+        </div>
+        <div class="game-profit ${isDebt ? 'neg' : 'pos'}">
+          ${isDebt ? 'Loss' : 'Profit'}: ${formatMoney(Math.abs(profit))}
+        </div>
+      `;
+      compareGamesContainer.appendChild(card);
+    });
+
+    addGameBtn.disabled = compareGames.length >= 6;
+    gameCountEl.textContent = `${compareGames.length} / 6 games`;
+    document.querySelectorAll('.game-card-remove').forEach(btn => {
+      btn.disabled = compareGames.length <= 2;
+    });
+    renderChart();
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Event delegation for compare mode
+  compareGamesContainer.addEventListener('input', (e) => {
+    const target = e.target;
+    if (!target.dataset.id) return;
+    const id = parseInt(target.dataset.id);
+    const field = target.dataset.field;
+    updateGame(id, field, target.value);
+    if (field === 'type') {
+      renderCompareGames();
+    } else {
+      updateProfitDisplay(target.closest('.game-card'), id);
+      renderChart();
+    }
+  });
+
+  compareGamesContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const id = parseInt(btn.dataset.id);
+    if (btn.dataset.field === 'type') {
+      updateGame(id, 'type', btn.dataset.value);
+      renderCompareGames();
+    } else if (btn.classList.contains('game-card-remove')) {
+      removeGame(id);
+    } else if (btn.classList.contains('game-card-dup')) {
+      duplicateGame(id);
+    }
+  });
+
+  compareGamesContainer.addEventListener('blur', (e) => {
+    const target = e.target;
+    if (!target.dataset.id) return;
+    const id = parseInt(target.dataset.id);
+    const field = target.dataset.field;
+    if (field === 'wager') {
+      target.value = formatInt(Math.min(parseNum(target.value), COMPARE_MAX_WAGER));
+    } else if (field === 'rtp') {
+      const game = compareGames.find(g => g.id === id);
+      if (game) target.value = game.rtp.toFixed(game.type === '75' ? 2 : 1);
+    }
+    updateGame(id, field, target.value);
+    updateProfitDisplay(target.closest('.game-card'), id);
+    renderChart();
+  }, true);
+
+  compareGamesContainer.addEventListener('keydown', (e) => {
+    if (e.target.dataset.field !== 'rtp') return;
+    const id = parseInt(e.target.dataset.id);
+    const game = compareGames.find(g => g.id === id);
+    if (!game) return;
+    const step = game.type === '75' ? 0.1 : 1;
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      game.rtp = clampRtp(game.type, game.rtp + step);
+      e.target.value = game.rtp.toFixed(game.type === '75' ? 2 : 1);
+      updateProfitDisplay(e.target.closest('.game-card'), id);
+      renderChart();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      game.rtp = clampRtp(game.type, game.rtp - step);
+      e.target.value = game.rtp.toFixed(game.type === '75' ? 2 : 1);
+      updateProfitDisplay(e.target.closest('.game-card'), id);
+      renderChart();
+    }
+  });
+
+  addGameBtn.addEventListener('click', addGame);
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.game-card-000');
+    if (btn) {
+      const card = btn.closest('.game-card');
+      if (!card) return;
+      const wagerInput = card.querySelector('[data-field="wager"]');
+      const id = parseInt(btn.dataset.id);
+      if (isNaN(id)) return;
+      const game = compareGames.find(g => g.id === id);
+      if (!game) return;
+      const next = game.wager === 0 ? 1000 : Math.min(game.wager * 1000, COMPARE_MAX_WAGER);
+      game.wager = next;
+      wagerInput.value = formatInt(next);
+      updateProfitDisplay(card, id);
+      renderChart();
+      return;
+    }
+    const arrow = e.target.closest('.rtp-arrow');
+    if (arrow) {
+      const card = arrow.closest('.game-card');
+      if (!card) return;
+      const id = parseInt(arrow.dataset.id);
+      if (isNaN(id)) return;
+      const game = compareGames.find(g => g.id === id);
+      if (!game) return;
+      const step = game.type === '75' ? 0.1 : 1;
+      const dir = arrow.classList.contains('up') ? 1 : -1;
+      game.rtp = clampRtp(game.type, game.rtp + step * dir);
+      const rtpInput = card.querySelector('[data-field="rtp"]');
+      rtpInput.value = game.rtp.toFixed(game.type === '75' ? 2 : 1);
+      updateProfitDisplay(card, id);
+      renderChart();
+    }
+  });
+
+  // Numeric keypad
+  const keypad = document.getElementById('keypad');
+  let keypadTarget = null;
+  let keypadHideTimeout = null;
+
+  function showKeypad(input) {
+    if (keypadHideTimeout) clearTimeout(keypadHideTimeout);
+    keypadTarget = input;
+    keypad.classList.add('visible');
+  }
+
+  function hideKeypad() {
+    keypadTarget = null;
+    keypad.classList.remove('visible');
+  }
+
+  comparePanel.addEventListener('focusin', (e) => {
+    const input = e.target;
+    if (input.dataset.field === 'wager' || input.dataset.field === 'rtp') {
+      if (keypadHideTimeout) clearTimeout(keypadHideTimeout);
+      keypadTarget = input;
+      keypad.classList.add('visible');
+    }
+  });
+
+  comparePanel.addEventListener('focusout', (e) => {
+    const input = e.target;
+    if (input.dataset.field === 'wager' || input.dataset.field === 'rtp') {
+      keypadHideTimeout = setTimeout(() => {
+        if (!keypad.matches(':hover')) hideKeypad();
+      }, 200);
+    }
+  });
+
+  keypad.addEventListener('mouseenter', () => {
+    if (keypadHideTimeout) clearTimeout(keypadHideTimeout);
+  });
+
+  keypad.addEventListener('mouseleave', () => {
+    if (!keypadTarget || !comparePanel.contains(document.activeElement)) {
+      hideKeypad();
+    }
+  });
+
+  keypad.addEventListener('click', (e) => {
+    const btn = e.target.closest('.keypad-btn');
+    if (!btn) return;
+    const val = btn.dataset.value;
+    if (val === 'hide') { hideKeypad(); return; }
+    if (!keypadTarget) return;
+    if (val === 'back') {
+      const cur = keypadTarget.value;
+      keypadTarget.value = cur.slice(0, -1);
+    } else {
+      const cur = keypadTarget.value;
+      const cursor = keypadTarget.selectionStart || cur.length;
+      const before = cur.slice(0, cursor);
+      const after = cur.slice(cursor);
+      keypadTarget.value = before + val + after;
+      const newPos = cursor + val.length;
+      keypadTarget.setSelectionRange(newPos, newPos);
+    }
+    const evt = new Event('input', { bubbles: true });
+    keypadTarget.dispatchEvent(evt);
+    keypadTarget.focus();
+  });
+
+  function renderChart() {
+    const values = compareGames.map(g => ({ name: g.name, value: payoutForGame(g) }));
+    renderLogSparkline(values);
+  }
+
+  function logScale(val) {
+    return val >= 0 ? Math.log10(val + 1) : -Math.log10(Math.abs(val) + 1);
+  }
+
+  function renderLogSparkline(values) {
+    const width = 800;
+    const height = 280;
+    const padding = { top: 24, right: 60, bottom: 44, left: 60 };
+    const chartW = width - padding.left - padding.right;
+    const chartH = height - padding.top - padding.bottom;
+
+    const logVals = values.map(v => ({ name: v.name, raw: v.value, log: logScale(v.value) }));
+
+    let minLog = 0, maxLog = 0;
+    logVals.forEach(v => {
+      if (v.log < minLog) minLog = v.log;
+      if (v.log > maxLog) maxLog = v.log;
+    });
+    if (minLog === 0 && maxLog === 0) maxLog = 1;
+    const range = maxLog - minLog;
+
+    const zeroY = padding.top + chartH * (maxLog / range);
+    const scaleX = i => padding.left + (i / (values.length - 1 || 1)) * chartW;
+    const scaleY = l => zeroY - (l / range) * chartH;
+
+    const points = values.map((v, i) => `${scaleX(i)},${scaleY(logScale(v.value))}`).join(' ');
+
+    let svg = `<svg class="chart-svg" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+
+    // Zero line
+    svg += `<line class="chart-zero-line" x1="${padding.left}" y1="${zeroY}" x2="${width - padding.right}" y2="${zeroY}"/>`;
+
+    // Axis lines
+    svg += `<line class="chart-axis" x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}"/>`;
+    svg += `<line class="chart-axis" x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}"/>`;
+
+    // Sparkline line
+    svg += `<polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    svg += `<polygon points="${scaleX(0)},${zeroY} ${points} ${scaleX(values.length - 1)},${zeroY}" fill="var(--accent-softer)"/>`;
+
+    // Data points + labels at top + name labels at bottom
+    values.forEach((v, i) => {
+      const x = scaleX(i);
+      const y = scaleY(logScale(v.value));
+      const color = v.value >= 0 ? 'var(--accent)' : 'var(--debt)';
+      svg += `<circle cx="${x}" cy="${y}" r="4.5" fill="${color}" stroke="var(--bg)" stroke-width="1.5"/>`;
+      svg += `<text class="chart-value" x="${x}" y="${y - 10}" text-anchor="middle" fill="${color}">${formatMoneyShort(v.value)}</text>`;
+      svg += `<text class="chart-label" x="${x}" y="${height - 8}" text-anchor="middle">${escapeSvg(v.name)}</text>`;
+    });
+
+    // Y-axis tick labels (log scale)
+    const maxAbs = Math.max(
+      ...values.map(v => Math.abs(v.value))
+    );
+    let tick = 1;
+    while (tick <= maxAbs || tick <= 10) {
+      const log = logScale(tick);
+      if (log >= minLog && log <= maxLog) {
+        const ty = scaleY(log);
+        if (ty > padding.top) {
+          svg += `<text class="chart-value" x="${padding.left - 8}" y="${ty + 3}" text-anchor="end" font-size="9">${formatMoneyShort(tick)}</text>`;
+        }
+      }
+      const negLog = logScale(-tick);
+      if (negLog >= minLog && negLog <= maxLog) {
+        const ty = scaleY(negLog);
+        if (ty < height - padding.bottom) {
+          svg += `<text class="chart-value" x="${padding.left - 8}" y="${ty + 3}" text-anchor="end" font-size="9">-${formatMoneyShort(tick)}</text>`;
+        }
+      }
+      tick *= 10;
+    }
+
+    svg += `</svg>`;
+    chartContainer.innerHTML = svg;
+  }
+
+  function formatMoneyShort(n) {
+    const sign = n < 0 ? '−' : '';
+    const abs = Math.abs(n);
+    if (abs >= 1_000_000) return sign + '$' + (abs / 1_000_000).toFixed(1) + 'M';
+    if (abs >= 1_000) return sign + '$' + (abs / 1_000).toFixed(1) + 'K';
+    return sign + '$' + abs.toFixed(0);
+  }
+
+  function escapeSvg(text) {
+    return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  renderCompareGames();
+
+  // --- Theme picker (family × palette × mode) ---
+  const TE = window.ThemeEngine;
+  const darkModeBtn = document.getElementById('darkModeBtn');
+  const lightModeBtn = document.getElementById('lightModeBtn');
+  const themeMenuBtn = document.getElementById('themeMenuBtn');
+  const themeMenu = document.getElementById('themeMenu');
+  const themeLabel = document.getElementById('themeLabel');
+  const familyGrid = document.getElementById('familyGrid');
+  const paletteGrid = document.getElementById('paletteGrid');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  familyGrid.innerHTML = TE.FAMILIES.map(f => `
+    <button type="button" class="fam-btn" data-family-id="${f.id}" aria-pressed="false">
+      <span class="fam-chip" data-fam="${f.id}" aria-hidden="true"></span>
+      <span>
+        <span class="fam-name">${f.name}</span>
+        <span class="fam-desc">${f.desc}</span>
+      </span>
+    </button>`).join('');
+
+  paletteGrid.innerHTML = TE.PALETTES.map(p => `
+    <button type="button" class="pal-btn" data-palette-id="${p.id}" title="${p.name}" aria-pressed="false">
+      <span class="pal-swatch"><i></i><i></i><i></i></span>
+      <span class="pal-name">${p.name}</span>
+    </button>`).join('');
+
+  const famBtns = Array.from(familyGrid.querySelectorAll('.fam-btn'));
+  const palBtns = Array.from(paletteGrid.querySelectorAll('.pal-btn'));
+
+  // Swatches preview the palette *in the current mode*, so flipping light/dark
+  // repaints them rather than re-rendering the grid.
+  function paintPicker() {
+    const s = TE.state;
+    themeLabel.textContent = TE.family(s.family).name + ' · ' + TE.palette(s.palette).name;
+    darkModeBtn.classList.toggle('active', s.mode !== 'light');
+    lightModeBtn.classList.toggle('active', s.mode === 'light');
+    famBtns.forEach(b => {
+      const on = b.dataset.familyId === s.family;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    palBtns.forEach(b => {
+      const p = TE.palette(b.dataset.paletteId);
+      const c = p[s.mode];
+      const sw = b.querySelector('.pal-swatch');
+      sw.style.setProperty('--sw-bg', c.bg);
+      sw.style.setProperty('--sw-a', c.accent);
+      sw.style.setProperty('--sw-d', c.debt);
+      sw.style.setProperty('--sw-fg', c.fg);
+      const on = p.id === s.palette;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+  }
+
+  // Circular reveal from whatever control was clicked. Uses the View
+  // Transitions API where it exists; elsewhere wipes an overlay painted in the
+  // *incoming* background, so the animation never flashes the outgoing theme.
+  function transitionTheme(originEl, mutate) {
+    const root = document.documentElement;
+    const commit = () => { mutate(); TE.apply(); paintPicker(); };
+
+    if (reducedMotion.matches || !originEl) { commit(); return; }
+
+    const rect = originEl.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    root.style.setProperty('--toggle-x', cx + 'px');
+    root.style.setProperty('--toggle-y', cy + 'px');
+
+    if (document.startViewTransition) {
+      document.startViewTransition(commit);
+      return;
+    }
+
+    mutate();
+    const target = TE.palette(TE.state.palette)[TE.state.mode].bg;
+    const overlay = document.createElement('div');
+    overlay.style.cssText =
+      'position:fixed;inset:0;z-index:999;pointer-events:none;will-change:clip-path;' +
+      'background:' + target + ';clip-path:circle(0% at ' + cx + 'px ' + cy + 'px);' +
+      'transition:clip-path .55s cubic-bezier(.4,0,.2,1)';
+    document.body.appendChild(overlay);
+    overlay.getBoundingClientRect();
+    overlay.style.clipPath = 'circle(150% at ' + cx + 'px ' + cy + 'px)';
+    setTimeout(() => { TE.apply(); paintPicker(); overlay.remove(); }, 570);
+  }
+
+  familyGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.fam-btn');
+    if (!btn || btn.dataset.familyId === TE.state.family) return;
+    transitionTheme(btn, () => { TE.state.family = btn.dataset.familyId; });
+  });
+
+  paletteGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.pal-btn');
+    if (!btn || btn.dataset.paletteId === TE.state.palette) return;
+    transitionTheme(btn, () => { TE.state.palette = btn.dataset.paletteId; });
+  });
+
+  darkModeBtn.addEventListener('click', () => {
+    if (TE.state.mode === 'dark') return;
+    transitionTheme(darkModeBtn, () => { TE.state.mode = 'dark'; });
+  });
+
+  lightModeBtn.addEventListener('click', () => {
+    if (TE.state.mode === 'light') return;
+    transitionTheme(lightModeBtn, () => { TE.state.mode = 'light'; });
+  });
+
+  document.getElementById('themeRandomBtn').addEventListener('click', (e) => {
+    const pick = (arr, not) => {
+      const pool = arr.filter(x => x.id !== not);
+      return pool[Math.floor(Math.random() * pool.length)].id;
+    };
+    transitionTheme(e.currentTarget, () => {
+      TE.state.family = pick(TE.FAMILIES, TE.state.family);
+      TE.state.palette = pick(TE.PALETTES, TE.state.palette);
+    });
+  });
+
+  document.getElementById('themeResetBtn').addEventListener('click', (e) => {
+    transitionTheme(e.currentTarget, () => {
+      TE.state.family = 'studio';
+      TE.state.palette = 'emerald';
+      TE.state.mode = TE.osMode();
+    });
+  });
+
+  function setMenuOpen(open) {
+    themeMenu.hidden = !open;
+    themeMenuBtn.setAttribute('aria-expanded', String(open));
+  }
+
+  themeMenuBtn.addEventListener('click', () => setMenuOpen(themeMenu.hidden));
+
+  document.addEventListener('click', (e) => {
+    if (themeMenu.hidden) return;
+    if (!themeMenu.contains(e.target) && !themeMenuBtn.contains(e.target)) setMenuOpen(false);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !themeMenu.hidden) { setMenuOpen(false); themeMenuBtn.focus(); }
+  });
+
+  paintPicker();
 </script>
 </body>
 </html>

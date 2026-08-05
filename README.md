@@ -10,13 +10,29 @@ Use it instantly at **[stake-engine-payout-calculator.vercel.app](https://stake-
 
 ## Usage
 
-1. Pick a model with the **7.5% Guaranteed / 10% GGR** tab at the top.
-2. Set **Total Wagered** — type a value, use the dice button to generate a random figure, or click one of the preset chips ($100K – $5M).
-3. Adjust the **RTP** slider for the selected model:
-   - **7.5% mode** — set the game's theoretical RTP (90–96%). Payout is calculated off expected GGR, so it never moves with variance.
-   - **10% mode** — set (or randomize) the *actual* RTP for the period. Payout is calculated off actual GGR, so it swings with real player outcomes, including going negative.
-4. Read the result panel for the payout, effective house edge, GGR, and the model's own 10%/7.5% cut.
-5. Toggle **light / dark mode** with the sun/moon control in the top-right corner. It defaults to your OS preference and persists for the session.
+1. Both models are shown side by side — **7.5% Guaranteed** on the left, **10% GGR** on the right — sharing one wager figure.
+2. Set **Total Wagered** — type a value, use the dice button to generate a random figure, hit **000** to append three zeros, or click one of the preset chips ($100K – $5M).
+3. Adjust each model's **RTP** slider (the link button between the columns keeps them in step):
+   - **7.5%** — the game's theoretical RTP (90–96.70%). Payout is calculated off expected GGR, so it never moves with variance.
+   - **10%** — the *actual* RTP for the period (75–120%), which you can also randomize. Payout is calculated off actual GGR, so it swings with real player outcomes, including going negative.
+4. Read each result panel for the payout, effective house edge, GGR, and the model's own 7.5%/10% cut.
+5. **Work backwards from a payout**: the "You receive" figure in either column is an input. Type the amount you want to earn and the Total Wagered needed to produce it is solved for you, with the other model's payout following along. The field you typed in stays pinned, so moving an RTP slider afterwards re-solves the wager rather than overwriting your number. (A negative-edge period produces a carried-forward debt, which has no valid inverse wager — that field locks until the edge is positive again.)
+6. Use the **Compare** tab to model up to six games at once and chart their payouts against each other.
+7. Pick a **theme** with the swatch button in the top-right corner, and flip **light / dark** with the sun/moon control.
+
+## Theming
+
+A theme is three independent choices, so the combinations multiply out to 180:
+
+- **Style** (6) — Studio, Terminal, Liquid Glass, Material You, Brutalist, Paper. Structure only: corner radii, border weight, typography, and material (backdrop blur, scanlines, tonal fills, hard offset shadows).
+- **Palette** (15) — Emerald, Amber, Ice, Violet, Rose, Casino Gold, Phosphor, Nord, Dracula, Gruvbox, Tokyo Night, Catppuccin, Solarized, Slate, Graphite.
+- **Mode** (2) — light or dark, defaulting to your OS preference.
+
+Your choice persists in `localStorage` and is applied before first paint, so there is no flash of the default theme on reload.
+
+Each palette declares only four seed colours per mode — background, foreground, accent, and debt — and every other token (panel, border, five text weights, dim and soft accent variants, glows) is derived from those in CSS with `color-mix()`. Adding a palette is two lines in the `PALETTES` table; the swatches in the picker are generated from that same table, so the UI can't drift from the stylesheet. Styles and modes own disjoint sets of custom properties, which is why all 180 combinations hold together without per-combination overrides.
+
+Switching any of the three animates as a circular reveal from the control you clicked, using the View Transitions API where it exists and falling back to a clip-path overlay wipe elsewhere. It respects `prefers-reduced-motion`.
 
 ### The 10% GGR randomizer
 
