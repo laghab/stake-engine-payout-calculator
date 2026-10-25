@@ -1,0 +1,1151 @@
+/* ==========================================================================
+   Praxis theme kit — styles. Canonical copy in ~/work/projects/theme-kit/.
+
+   How a site uses it:
+   1. Tokens. Everything is derived from the palette seeds (--bg, --fg,
+      --accent, --accent-2) and restyled per family. Base tokens sit in
+      :where() so a site may override them; family and palette rules use
+      html:root[...] so they beat a site's own :root rules.
+   2. Hook classes, for elements a site hands over to the kit wholesale:
+        .tk-body     page background (Bliss, blobs, grid, casino carpet…)
+        .tk-header   top bar (XP: taskbar · Arcade: marquee lights)
+        .tk-brand    logo/title link in the header (XP: Start button)
+        .tk-window   main content area (XP: a window with a title bar;
+                     set data-title="…" for the caption)
+        .tk-surface  a panel/card        .tk-tile  a clickable card
+        .tk-btn      a button            .tk-pill  a small tag
+        .tk-display  a big heading       .tk-rise  staggered entrance (--i)
+      Or a site can read the surface/button tokens in its own rules.
+   ========================================================================== */
+
+/* ---- base tokens (overridable) ---- */
+:where(:root) {
+  --bg: #f6f7f9;
+  --fg: #12141a;
+  --accent: #3457e0;
+  --accent-2: color-mix(in oklab, var(--accent), #ff5fa2 60%);
+  --accent-fg: #ffffff;
+
+  --elev-tint: #ffffff;
+  --elev-lift: 70%;
+  --elev2-tint: var(--fg);
+  --elev2-lift: 4%;
+  --shade: rgba(20, 23, 28, 0.12);
+  --shade-weak: rgba(20, 23, 28, 0.06);
+
+  --bg-elev: color-mix(in oklab, var(--bg), var(--elev-tint) var(--elev-lift));
+  --bg-elev-2: color-mix(in oklab, var(--bg), var(--elev2-tint) var(--elev2-lift));
+  --line: color-mix(in oklab, var(--bg), var(--fg) 13%);
+  --fg-dim: color-mix(in oklab, var(--bg), var(--fg) 64%);
+  --fg-dimmer: color-mix(in oklab, var(--bg), var(--fg) 46%);
+  --accent-soft: color-mix(in oklab, var(--bg-elev), var(--accent) 14%);
+  --accent-strong: color-mix(in oklab, var(--accent), var(--fg) 12%);
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --font-body: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: Manrope, Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  --ease: cubic-bezier(0.2, 0.6, 0.3, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+
+  /* surfaces */
+  --surface-bg: var(--bg-elev);
+  --surface-border: var(--line);
+  --surface-border-w: 1px;
+  --surface-shadow: 0 1px 2px var(--shade-weak);
+  --surface-clip: none;
+  --surface-blur: none;
+  --tile-hover-bg: var(--surface-bg);
+  --tile-hover-border: color-mix(in srgb, var(--accent) 45%, var(--line));
+  --tile-hover-shadow: 0 14px 34px -14px var(--shade);
+  --tile-hover-transform: translateY(-4px);
+  --tile-active-transform: translateY(-1px) scale(0.975);
+
+  /* buttons */
+  --btn-bg: var(--bg-elev);
+  --btn-fg: var(--fg-dim);
+  --btn-border: var(--line);
+  --btn-shadow: none;
+  --btn-clip: none;
+  --btn-radius: var(--radius-pill);
+  --btn-hover-bg: var(--bg-elev);
+  --btn-hover-fg: var(--fg);
+  --btn-hover-border: color-mix(in srgb, var(--accent) 45%, var(--line));
+  --btn-hover-shadow: none;
+  --btn-active-transform: scale(0.93);
+  --btn-primary-bg: var(--accent);
+  --btn-primary-fg: var(--accent-fg);
+
+  /* header + page */
+  --header-bg: color-mix(in srgb, var(--bg) 86%, transparent);
+  --header-fg: var(--fg);
+  --header-border: var(--line);
+  --header-blur: blur(12px);
+  --header-shadow: none;
+  --page-bg:
+    radial-gradient(1100px 480px at 50% -12%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    var(--bg);
+
+  /* display type */
+  --display-transform: none;
+  --display-spacing: -0.02em;
+  --display-weight: 700;
+  --display-shadow: none;
+
+  color-scheme: light;
+}
+
+:where(:root[data-mode="dark"]) {
+  --bg: #0c0e13;
+  --fg: #edeff4;
+  --accent: #5b7cff;
+  --accent-fg: var(--bg);
+  --elev-lift: 5%;
+  --elev2-tint: #ffffff;
+  --elev2-lift: 8%;
+  --shade: rgba(0, 0, 0, 0.45);
+  --shade-weak: rgba(0, 0, 0, 0.25);
+  --accent-strong: color-mix(in oklab, var(--accent), #ffffff 14%);
+  color-scheme: dark;
+}
+
+/* ---- hook classes ---- */
+.tk-body {
+  background: var(--page-bg);
+  background-attachment: fixed;
+  font-family: var(--font-body);
+}
+
+.tk-header {
+  background: var(--header-bg);
+  color: var(--header-fg);
+  border-bottom: 1px solid var(--header-border);
+  -webkit-backdrop-filter: var(--header-blur);
+  backdrop-filter: var(--header-blur);
+  box-shadow: var(--header-shadow);
+}
+
+.tk-surface,
+.tk-tile {
+  background: var(--surface-bg);
+  border: var(--surface-border-w) solid var(--surface-border);
+  border-radius: var(--radius);
+  box-shadow: var(--surface-shadow);
+  clip-path: var(--surface-clip);
+  -webkit-backdrop-filter: var(--surface-blur);
+  backdrop-filter: var(--surface-blur);
+}
+
+.tk-tile {
+  transition:
+    transform 0.4s var(--spring),
+    box-shadow 0.3s var(--ease),
+    border-color 0.25s var(--ease),
+    background 0.3s var(--ease),
+    border-radius 0.35s var(--ease-out),
+    opacity 0.25s ease;
+}
+
+.tk-tile:hover,
+.tk-tile:focus-visible {
+  background: var(--tile-hover-bg);
+  border-color: var(--tile-hover-border);
+  box-shadow: var(--tile-hover-shadow);
+  transform: var(--tile-hover-transform);
+  outline: none;
+}
+
+.tk-tile:active {
+  transform: var(--tile-active-transform);
+  transition-duration: 0.12s;
+}
+
+.tk-btn {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--btn-radius);
+  box-shadow: var(--btn-shadow);
+  clip-path: var(--btn-clip);
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.18s var(--ease),
+    color 0.18s var(--ease),
+    border-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease),
+    transform 0.3s var(--spring);
+}
+
+.tk-btn:hover {
+  background: var(--btn-hover-bg);
+  color: var(--btn-hover-fg);
+  border-color: var(--btn-hover-border);
+  box-shadow: var(--btn-hover-shadow);
+}
+
+.tk-btn:active { transform: var(--btn-active-transform); }
+
+.tk-btn-primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
+  border-color: transparent;
+}
+
+.tk-btn-primary:hover {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
+  filter: brightness(1.08);
+}
+
+.tk-pill {
+  border-radius: var(--radius-pill);
+}
+
+.tk-display {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-spacing);
+  text-transform: var(--display-transform);
+  text-shadow: var(--display-shadow);
+}
+
+/* staggered entrance: give elements .tk-rise and --i (ThemeKit.stagger does it) */
+@keyframes tk-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+.tk-rise {
+  /* fill-mode backwards so hover transforms take over once it has played */
+  animation: tk-rise 0.5s var(--spring) backwards;
+  animation-delay: calc(var(--i, 0) * 50ms + 60ms);
+}
+
+@keyframes tk-fade-in {
+  from { opacity: 0; transform: translateY(8px); filter: blur(3px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+.tk-page-enter { animation: tk-fade-in 0.42s var(--ease-out) backwards; }
+
+/* page effects layer (scanlines, twinkles) — injected by the script */
+.tk-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  display: none;
+}
+
+/* ---- theme transitions ---- */
+.tk-no-trans,
+.tk-no-trans *,
+.tk-no-trans *::before,
+.tk-no-trans *::after { transition: none !important; }
+
+:root[data-vt]::view-transition-old(root),
+:root[data-vt]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+/* dark: the outgoing page sits on top and collapses into the button */
+:root[data-vt="shrink"]::view-transition-old(root) { z-index: 2; }
+:root[data-vt="shrink"]::view-transition-new(root) { z-index: 1; }
+
+/* ==========================================================================
+   PICKER
+   ========================================================================== */
+.tk-controls {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+}
+
+.tk-controls .tk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.tk-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent) 0 40%, var(--accent-2) 40% 60%, var(--fg) 60% 80%, var(--bg-elev-2) 80%);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.tk-mode { position: relative; width: 32px; padding: 0 !important; overflow: hidden; }
+.tk-mode svg { position: absolute; transition: transform 0.55s var(--spring), opacity 0.3s var(--ease); }
+.tk-mode .tk-sun { opacity: 0; transform: rotate(-90deg) scale(0.4); }
+.tk-mode .tk-moon { opacity: 1; transform: none; }
+:root[data-mode="dark"] .tk-mode .tk-sun { opacity: 1; transform: none; }
+:root[data-mode="dark"] .tk-mode .tk-moon { opacity: 0; transform: rotate(90deg) scale(0.4); }
+
+@keyframes tk-menu-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+.tk-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 9000;
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(78vh, 640px);
+  overflow-y: auto;
+  padding: 14px;
+  text-align: left;
+  color: var(--fg);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px -20px var(--shade), 0 2px 8px -4px var(--shade);
+  transform-origin: top right;
+  animation: tk-menu-in 0.3s var(--spring);
+}
+
+.tk-menu[hidden] { display: none; }
+
+.tk-menu-head {
+  margin: 0 0 9px 2px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-dimmer);
+}
+
+.tk-fam-grid,
+.tk-pal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.tk-fam-grid { margin-bottom: 16px; }
+
+.tk-fam,
+.tk-pal {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  animation: tk-rise 0.35s var(--spring) backwards;
+  transition: border-color 0.16s var(--ease), background 0.16s var(--ease), transform 0.3s var(--spring);
+}
+
+.tk-fam {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 7px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  text-align: left;
+  animation-delay: calc(var(--i, 0) * 25ms);
+}
+
+.tk-fam:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); transform: translateY(-2px); }
+.tk-fam[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.tk-fam-name { margin-top: 5px; font-size: 11.5px; font-weight: 600; color: var(--fg); }
+.tk-fam-desc { font-size: 10px; line-height: 1.3; color: var(--fg-dimmer); }
+
+.tk-pal {
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  text-align: center;
+  animation-delay: calc(var(--i, 0) * 16ms);
+}
+
+.tk-pal:hover { border-color: var(--line); transform: translateY(-2px); }
+.tk-pal[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+
+.tk-swatch {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 34px;
+  padding: 5px;
+  border-radius: 7px;
+  border: 1px solid;
+  overflow: hidden;
+}
+
+.tk-swatch i { display: block; flex: 1; height: 9px; border-radius: 3px; }
+.tk-swatch i:first-child { height: 100%; }
+.tk-swatch i:last-child { flex: 0 0 5px; }
+
+.tk-pal-name {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tk-pal[aria-pressed="true"] .tk-pal-name { color: var(--accent-strong); font-weight: 600; }
+
+.tk-menu-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--fg-dimmer);
+}
+
+.tk-dash { color: var(--accent-strong); font-weight: 600; text-decoration: none; }
+.tk-dash:hover { text-decoration: underline; }
+
+/* chips preview each style's silhouette */
+.tk-chip {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 28px;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--bg), var(--fg) 25%);
+  background: var(--bg);
+}
+.tk-chip i { position: absolute; display: block; }
+
+.tk-chip[data-fam="modern"] { border-radius: 7px; }
+.tk-chip[data-fam="modern"] i { left: 6px; bottom: 6px; width: 12px; height: 12px; border-radius: 4px; background: var(--accent); }
+
+.tk-chip[data-fam="glass"] {
+  border-radius: 11px;
+  border-color: color-mix(in srgb, #fff 45%, transparent);
+  background:
+    radial-gradient(60% 90% at 20% 20%, color-mix(in srgb, var(--accent) 70%, transparent), transparent),
+    radial-gradient(60% 90% at 90% 80%, color-mix(in srgb, #ff5fa2 55%, transparent), transparent),
+    var(--bg);
+}
+.tk-chip[data-fam="glass"] i { inset: 5px 10px; border-radius: 7px; background: color-mix(in srgb, #fff 30%, transparent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+
+.tk-chip[data-fam="factorio"] {
+  border: 0;
+  border-radius: 0;
+  background: #403f40;
+  box-shadow: 0 0 0 1px #000, inset 1px 1px 0 rgba(255, 255, 255, 0.14), inset -1px -1px 0 rgba(0, 0, 0, 0.6);
+}
+.tk-chip[data-fam="factorio"] i {
+  left: 5px;
+  right: 5px;
+  top: 5px;
+  height: 6px;
+  background: repeating-linear-gradient(to bottom, #2a292a 0 1px, #5a595a 1px 2px);
+}
+.tk-chip[data-fam="factorio"] i::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 26px;
+  height: 7px;
+  background: linear-gradient(#ffc56b, #ff9f1b);
+  box-shadow: 0 0 0 1px #000, 0 0 6px #ff9f1b;
+}
+
+.tk-chip[data-fam="xp"] { border-radius: 5px 5px 0 0; border: 2px solid #0a5ae0; border-top: 0; background: #ece9d8; }
+.tk-chip[data-fam="xp"] i { top: 0; left: 0; right: 0; height: 9px; background: linear-gradient(#3d8af7, #0a5ae0 40%, #0a4bc6); }
+.tk-chip[data-fam="xp"] i::after { content: ""; position: absolute; top: 1px; right: 2px; width: 7px; height: 7px; border-radius: 1px; background: #e0512f; box-shadow: 0 0 0 1px #fff; }
+
+.tk-chip[data-fam="cyber"] {
+  border: 0;
+  background: #07070b;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  box-shadow: inset 0 0 0 1px #fcee0a;
+}
+.tk-chip[data-fam="cyber"] i { left: 6px; right: 14px; top: 12px; height: 2px; background: #00f0ff; box-shadow: 0 0 6px #00f0ff, 0 5px 0 -0.5px #fcee0a; }
+
+.tk-chip[data-fam="arcade"] {
+  border-radius: 8px;
+  border: 2px solid #ffc53d;
+  background: radial-gradient(circle at 50% 120%, #ff3b5c55, transparent 70%), #1a0710;
+}
+.tk-chip[data-fam="arcade"] i {
+  left: 3px;
+  right: 3px;
+  top: 3px;
+  height: 5px;
+  background: radial-gradient(circle, #ffe38a 0 1.6px, transparent 2px) 0 0 / 7px 5px repeat-x;
+}
+
+/* ==========================================================================
+   FAMILY: Liquid Glass — frosted translucent panels over soft colour blobs
+   ========================================================================== */
+html:root[data-family="glass"] {
+  --radius: 22px;
+  --radius-sm: 14px;
+  --glass: color-mix(in oklab, var(--bg-elev) 58%, transparent);
+  --glass-strong: color-mix(in oklab, var(--bg-elev) 78%, transparent);
+  --glass-edge: rgba(255, 255, 255, 0.6);
+  --glass-hi: rgba(255, 255, 255, 0.75);
+  --glass-blur: blur(22px) saturate(180%);
+  --blob: 38%;
+
+  --surface-bg: var(--glass);
+  --surface-border: var(--glass-edge);
+  --surface-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 36px -14px var(--shade);
+  --surface-blur: var(--glass-blur);
+  --tile-hover-bg: var(--glass-strong);
+  --btn-bg: var(--glass);
+  --btn-border: var(--glass-edge);
+  --btn-shadow: inset 0 1px 0 var(--glass-hi);
+  --btn-hover-bg: var(--glass-strong);
+  --header-bg: var(--glass);
+  --header-border: var(--glass-edge);
+  --header-blur: var(--glass-blur);
+  --page-bg:
+    radial-gradient(38% 48% at 12% 8%, color-mix(in srgb, var(--accent) var(--blob), transparent), transparent 70%),
+    radial-gradient(34% 44% at 88% 18%, color-mix(in srgb, color-mix(in oklab, var(--accent), #ff5fa2 60%) calc(var(--blob) + 20%), transparent), transparent 70%),
+    radial-gradient(40% 50% at 70% 92%, color-mix(in srgb, color-mix(in oklab, var(--accent), #2ee6d6 55%) calc(var(--blob) + 20%), transparent), transparent 70%),
+    var(--bg);
+}
+
+html:root[data-family="glass"][data-mode="dark"] {
+  --glass: color-mix(in oklab, var(--bg-elev) 55%, transparent);
+  --glass-strong: color-mix(in oklab, var(--bg-elev) 80%, transparent);
+  --glass-edge: rgba(255, 255, 255, 0.13);
+  --glass-hi: rgba(255, 255, 255, 0.16);
+  --blob: 30%;
+}
+
+html:root[data-family="glass"] .tk-menu {
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-color: var(--glass-edge);
+}
+
+/* ==========================================================================
+   FAMILY: Windows XP — Luna title bars, beveled buttons, Bliss desktop
+   ========================================================================== */
+html:root[data-family="xp"] {
+  --font-body: Tahoma, "Segoe UI", Verdana, sans-serif;
+  --font-display: "Trebuchet MS", Tahoma, sans-serif;
+  --radius: 3px;
+  --radius-sm: 3px;
+  --radius-pill: 3px;
+  --elev-lift: 100%;
+  --elev2-tint: var(--fg);
+  --elev2-lift: 3%;
+  --line: color-mix(in oklab, var(--bg), var(--fg) 22%);
+  --accent-soft: color-mix(in srgb, var(--xp-select) 16%, var(--bg-elev));
+  --accent-strong: var(--xp-select);
+
+  --xp-title-1: color-mix(in oklab, var(--accent), #fff 32%);
+  --xp-title-2: var(--accent);
+  --xp-title-3: color-mix(in oklab, var(--accent), #000 22%);
+  --xp-title: linear-gradient(180deg, var(--xp-title-1) 0%, var(--xp-title-2) 14%,
+    color-mix(in oklab, var(--accent), #fff 8%) 50%, var(--xp-title-2) 86%, var(--xp-title-3) 100%);
+  --xp-btn: linear-gradient(180deg, #ffffff 0%, #f4f3ee 45%, #e6e2d6 88%, #d6d0c5 100%);
+  --xp-btn-press: linear-gradient(180deg, #d6d0c5 0%, #e6e2d6 20%, #f4f3ee 100%);
+  --xp-btn-border: #003c74;
+  --xp-field: #7f9db9;
+  --xp-hover: #f8b33a;
+  --xp-hover-2: #fdd889;
+  --xp-select: #316ac5;
+  --xp-start: linear-gradient(180deg, #62b95a 0%, #3c9c3c 18%, #2f8a2f 60%, #257725 100%);
+  --xp-glow: inset 0 -2px 0 var(--xp-hover), inset 0 2px 0 var(--xp-hover-2), inset 2px 0 0 var(--xp-hover-2), inset -2px 0 0 var(--xp-hover-2);
+
+  --surface-bg: var(--bg-elev);
+  --surface-border: var(--xp-field);
+  --surface-shadow: none;
+  --tile-hover-border: var(--xp-hover);
+  --tile-hover-shadow: inset 0 0 0 1px var(--xp-hover-2), 0 0 0 1px var(--xp-hover-2);
+  --tile-hover-transform: none;
+  --tile-active-transform: translate(1px, 1px);
+
+  --btn-bg: var(--xp-btn);
+  --btn-fg: var(--fg);
+  --btn-border: var(--xp-btn-border);
+  --btn-hover-bg: var(--xp-btn);
+  --btn-hover-fg: var(--fg);
+  --btn-hover-border: var(--xp-btn-border);
+  --btn-hover-shadow: var(--xp-glow);
+  --btn-active-transform: none;
+  --btn-primary-bg: var(--xp-btn);
+  --btn-primary-fg: var(--fg);
+
+  --header-bg: var(--xp-title);
+  --header-fg: var(--accent-fg);
+  --header-border: var(--xp-title-3);
+  --header-blur: none;
+  --header-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --page-bg:
+    radial-gradient(ellipse 95% 46% at 22% 108%, #5fae3b 0 58%, transparent 59%),
+    radial-gradient(ellipse 85% 40% at 90% 110%, #4a9a2e 0 58%, transparent 59%),
+    radial-gradient(ellipse 18% 7% at 68% 20%, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(ellipse 12% 5% at 76% 17%, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(ellipse 20% 8% at 22% 30%, rgba(255, 255, 255, 0.65), transparent 70%),
+    linear-gradient(180deg, #2a6bd4 0%, #4f93e8 38%, #9cc8f3 68%, #d4e9fb 100%);
+
+  --display-spacing: 0;
+}
+
+html:root[data-family="xp"][data-mode="dark"] {
+  --elev-lift: 4%;
+  --xp-btn: linear-gradient(180deg, #55585f 0%, #45484e 45%, #37393e 88%, #2c2e32 100%);
+  --xp-btn-press: linear-gradient(180deg, #2c2e32 0%, #37393e 20%, #45484e 100%);
+  --xp-btn-border: #111316;
+  --xp-field: #5a6272;
+  --page-bg:
+    radial-gradient(ellipse 95% 46% at 22% 108%, #1e4217 0 58%, transparent 59%),
+    radial-gradient(ellipse 85% 40% at 90% 110%, #183813 0 58%, transparent 59%),
+    radial-gradient(ellipse 18% 7% at 68% 20%, rgba(255, 255, 255, 0.1), transparent 70%),
+    radial-gradient(ellipse 20% 8% at 22% 30%, rgba(255, 255, 255, 0.08), transparent 70%),
+    linear-gradient(180deg, #050b1c 0%, #0c1c3f 45%, #1d3563 100%);
+}
+
+html:root[data-family="xp"] ::selection { background: var(--xp-select); color: #fff; }
+html:root[data-family="xp"] .tk-btn:active { background: var(--xp-btn-press); }
+
+/* the main area becomes a window */
+html:root[data-family="xp"] .tk-window {
+  position: relative;
+  margin-top: 26px;
+  margin-bottom: 48px;
+  padding-top: calc(30px + 1.75rem);
+  background: var(--bg);
+  border: 3px solid var(--xp-title-2);
+  border-top: 0;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 3px 5px 18px rgba(0, 0, 0, 0.4);
+}
+
+html:root[data-family="xp"] .tk-window::before {
+  content: attr(data-title);
+  position: absolute;
+  top: 0;
+  left: -3px;
+  right: -3px;
+  height: 30px;
+  padding-left: 12px;
+  border-radius: 8px 8px 0 0;
+  background: var(--xp-title);
+  color: var(--accent-fg);
+  font: bold 13px/30px var(--font-display);
+  text-align: left;
+  text-shadow: 1px 1px 1px color-mix(in oklab, var(--xp-title-3), #000 45%);
+}
+
+/* close button; minimize/maximize are drawn as its shadows */
+html:root[data-family="xp"] .tk-window::after {
+  content: "✕";
+  position: absolute;
+  top: 4px;
+  right: 3px;
+  width: 21px;
+  height: 21px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #f09a80 0%, #e0512f 40%, #c43a18 100%);
+  color: #fff;
+  font: bold 12px/21px Tahoma, sans-serif;
+  text-align: center;
+  box-shadow:
+    inset 0 0 0 1px #fff,
+    -24px 0 0 0 var(--xp-title-1), -24px 0 0 1px #fff,
+    -48px 0 0 0 var(--xp-title-1), -48px 0 0 1px #fff;
+}
+
+/* header = taskbar, brand = Start button */
+html:root[data-family="xp"] .tk-brand {
+  margin-left: -20px;
+  padding: 3px 18px 3px 10px;
+  border-radius: 0 14px 14px 0;
+  background: var(--xp-start);
+  color: #fff;
+  font-style: italic;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 2px 0 4px rgba(0, 0, 0, 0.3);
+}
+
+html:root[data-family="xp"] .tk-brand:hover { filter: brightness(1.08); }
+
+html:root[data-family="xp"] .tk-header .tk-btn {
+  border-color: rgba(0, 0, 0, 0.35);
+  background: color-mix(in srgb, #fff 16%, transparent);
+  color: var(--accent-fg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+html:root[data-family="xp"] .tk-header .tk-btn:hover { background: color-mix(in srgb, #fff 28%, transparent); }
+html:root[data-family="xp"] .tk-header .tk-btn:active { box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.4); }
+
+html:root[data-family="xp"] .tk-menu {
+  border-radius: 0;
+  border-color: var(--xp-btn-border);
+  background: var(--bg);
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+html:root[data-family="xp"] .tk-fam { border-radius: 3px; border-color: var(--xp-btn-border); background: var(--xp-btn); }
+html:root[data-family="xp"] .tk-fam:hover { transform: none; box-shadow: var(--xp-glow); }
+html:root[data-family="xp"] :is(.tk-fam, .tk-pal)[aria-pressed="true"] { border-color: var(--xp-select); background: var(--accent-soft); }
+html:root[data-family="xp"] :is(.tk-pal, .tk-swatch) { border-radius: 2px; }
+
+/* no floaty entrances in XP: things snap like they used to */
+html:root[data-family="xp"] .tk-page-enter { animation: none; }
+
+/* ==========================================================================
+   FAMILY: Factorio — beveled steel frames, striped drag bars, orange glow
+   Frames are outset bevels outlined in black; content wells are inset. Grey
+   push buttons light up orange on hover; primary actions are the green
+   confirm button. Titillium Web is the game's own UI face.
+   ========================================================================== */
+html:root[data-family="factorio"] {
+  --font-body: "Titillium Web", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Titillium Web", "Segoe UI", system-ui, sans-serif;
+  --radius: 2px;
+  --radius-sm: 2px;
+  --radius-pill: 2px;
+  --elev-lift: 14%;
+  --elev2-tint: #000000;
+  --elev2-lift: 22%;
+  --line: #000000;
+  --accent-strong: var(--accent);
+  --spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --fo-heading: color-mix(in oklab, #ffe6c0, var(--fg) 30%);
+  --fo-bevel: inset 1px 1px 0 rgba(255, 255, 255, 0.12), inset -1px -1px 0 rgba(0, 0, 0, 0.55);
+  --fo-well: inset 1px 1px 0 rgba(0, 0, 0, 0.6), inset -1px -1px 0 rgba(255, 255, 255, 0.08);
+  --fo-stripes: repeating-linear-gradient(to bottom, color-mix(in oklab, var(--bg-elev), #000 35%) 0 2px, color-mix(in oklab, var(--bg-elev), #fff 12%) 2px 4px);
+  --fo-btn: linear-gradient(180deg, #c4c4c4 0%, #a9a9a9 45%, #8e8e8e 100%);
+  --fo-btn-hover: linear-gradient(180deg, color-mix(in oklab, var(--accent), #fff 35%) 0%, var(--accent) 60%, color-mix(in oklab, var(--accent), #000 12%) 100%);
+  --fo-btn-press: linear-gradient(180deg, color-mix(in oklab, var(--accent), #000 20%), var(--accent));
+  --fo-green: linear-gradient(180deg, color-mix(in oklab, var(--accent-2), #fff 25%) 0%, var(--accent-2) 55%, color-mix(in oklab, var(--accent-2), #000 18%) 100%);
+
+  --surface-bg: var(--bg-elev);
+  --surface-border: #000000;
+  --surface-border-w: 1px;
+  --surface-shadow: var(--fo-bevel), 0 4px 12px -4px rgba(0, 0, 0, 0.55);
+  --tile-hover-bg: color-mix(in oklab, var(--bg-elev), var(--accent) 6%);
+  --tile-hover-border: var(--accent);
+  --tile-hover-shadow: var(--fo-bevel), 0 0 0 1px var(--accent), 0 0 14px -2px color-mix(in srgb, var(--accent) 70%, transparent);
+  --tile-hover-transform: none;
+  --tile-active-transform: translateY(1px);
+
+  --btn-bg: var(--fo-btn);
+  --btn-fg: #141312;
+  --btn-border: #000000;
+  --btn-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+  --btn-hover-bg: var(--fo-btn-hover);
+  --btn-hover-fg: #000000;
+  --btn-hover-border: #000000;
+  --btn-hover-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 10px -1px color-mix(in srgb, var(--accent) 80%, transparent);
+  --btn-active-transform: translateY(1px);
+  --btn-primary-bg: var(--fo-green);
+  --btn-primary-fg: #000000;
+
+  --header-bg: var(--bg-elev);
+  --header-fg: var(--fg);
+  --header-border: #000000;
+  --header-blur: none;
+  --header-shadow: var(--fo-bevel), 0 2px 10px rgba(0, 0, 0, 0.5);
+
+  /* a concrete-tiled factory floor */
+  --page-bg:
+    radial-gradient(90% 70% at 50% 0%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
+    radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.45)),
+    linear-gradient(rgba(0, 0, 0, 0.22) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, rgba(0, 0, 0, 0.22) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 32px / 64px 64px,
+    var(--bg);
+
+  --display-spacing: 0;
+  --display-weight: 700;
+}
+
+html:root[data-family="factorio"][data-mode="light"] {
+  --elev-lift: 32%;
+  --elev2-tint: #000000;
+  --elev2-lift: 8%;
+  --fo-heading: color-mix(in oklab, var(--fg), var(--accent) 25%);
+  --fo-bevel: inset 1px 1px 0 rgba(255, 255, 255, 0.6), inset -1px -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+html:root[data-family="factorio"] .tk-btn:active { background: var(--fo-btn-press); box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35); }
+html:root[data-family="factorio"] .tk-display { color: var(--fo-heading); text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45); }
+html:root[data-family="factorio"][data-mode="light"] .tk-display { text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55); }
+
+/* window: title, then the striped drag handle filling the rest of the bar */
+html:root[data-family="factorio"] .tk-window {
+  position: relative;
+  margin-top: 22px;
+  margin-bottom: 40px;
+  padding-top: calc(34px + 1.5rem);
+  background: var(--bg-elev);
+  border: 1px solid #000;
+  box-shadow: var(--fo-bevel), 0 10px 30px -8px rgba(0, 0, 0, 0.6);
+}
+
+html:root[data-family="factorio"] .tk-window::before {
+  content: attr(data-title);
+  position: absolute;
+  z-index: 1;
+  top: 7px;
+  left: 12px;
+  padding-right: 10px;
+  background: var(--bg-elev);
+  color: var(--fo-heading);
+  font: 700 17px/22px var(--font-display);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+html:root[data-family="factorio"] .tk-window::after {
+  content: "";
+  position: absolute;
+  top: 11px;
+  left: 12px;
+  right: 12px;
+  height: 14px;
+  background: var(--fo-stripes);
+}
+
+html:root[data-family="factorio"] .tk-brand {
+  color: var(--fo-heading);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+html:root[data-family="factorio"] .tk-menu {
+  border-radius: 0;
+  border-color: #000;
+  background: var(--bg-elev);
+  box-shadow: var(--fo-bevel), 0 12px 30px -6px rgba(0, 0, 0, 0.7);
+}
+
+html:root[data-family="factorio"] .tk-menu-head { color: var(--fo-heading); font-weight: 700; font-size: 12px; letter-spacing: 0; text-transform: none; }
+
+/* picker entries are inset "slots" */
+html:root[data-family="factorio"] :is(.tk-fam, .tk-pal) {
+  border-radius: 0;
+  border-color: #000;
+  background: var(--bg-elev-2);
+  box-shadow: var(--fo-well);
+}
+
+html:root[data-family="factorio"] :is(.tk-fam, .tk-pal):hover { transform: none; border-color: var(--accent); box-shadow: var(--fo-well), 0 0 8px -1px var(--accent); }
+html:root[data-family="factorio"] :is(.tk-fam, .tk-pal)[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in oklab, var(--bg-elev-2), var(--accent) 22%); }
+html:root[data-family="factorio"] .tk-swatch { border-radius: 0; }
+
+/* snappy, like the game: no floaty page entrance */
+html:root[data-family="factorio"] .tk-page-enter { animation: none; }
+
+/* ==========================================================================
+   FAMILY: Cyberpunk — neon on black, notched corners, scanlines, glitch
+   Clip-path notches cut away outer borders and shadows, so edges are inset
+   shadows instead.
+   ========================================================================== */
+html:root[data-family="cyber"] {
+  --font-body: Rajdhani, "Archivo Narrow", "Segoe UI", system-ui, sans-serif;
+  --font-display: Orbitron, Rajdhani, "Segoe UI", system-ui, sans-serif;
+  --radius: 0px;
+  --radius-sm: 0px;
+  --radius-pill: 0px;
+  --notch: 14px;
+  --notch-sm: 7px;
+  --neon: color-mix(in srgb, var(--accent) 60%, transparent);
+  --edge: color-mix(in oklab, var(--bg), var(--accent) 42%);
+  --line: color-mix(in oklab, var(--bg), var(--accent) 28%);
+  --elev-lift: 3%;
+  --spring: cubic-bezier(0.2, 0.9, 0.1, 1);
+  --accent-strong: var(--accent);
+
+  --surface-bg:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 45%),
+    color-mix(in oklab, var(--bg), var(--fg) 4%);
+  --surface-border: transparent;
+  --surface-border-w: 0px;
+  --surface-shadow: inset 0 0 0 1px var(--edge), inset 3px 0 0 0 var(--accent);
+  --surface-clip: polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, var(--notch) 100%, 0 calc(100% - var(--notch)));
+  --tile-hover-bg:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
+    color-mix(in oklab, var(--bg), var(--fg) 6%);
+  --tile-hover-border: transparent;
+  --tile-hover-shadow: inset 0 0 0 1px var(--accent), inset 3px 0 0 0 var(--accent-2), inset 0 0 30px -10px var(--neon);
+  --tile-hover-transform: translate(2px, -3px);
+  --tile-active-transform: translate(0, 0);
+
+  --btn-bg: transparent;
+  --btn-fg: var(--accent);
+  --btn-border: transparent;
+  --btn-shadow: inset 0 0 0 1px var(--edge);
+  --btn-clip: polygon(0 0, calc(100% - var(--notch-sm)) 0, 100% var(--notch-sm), 100% 100%, var(--notch-sm) 100%, 0 calc(100% - var(--notch-sm)));
+  --btn-hover-bg: var(--accent);
+  --btn-hover-fg: var(--accent-fg);
+  --btn-hover-border: transparent;
+  --btn-hover-shadow: 0 0 18px var(--neon);
+  --btn-active-transform: translate(1px, 1px);
+
+  --header-bg: color-mix(in srgb, var(--bg) 88%, transparent);
+  --header-border: var(--accent);
+  --header-shadow: 0 1px 0 var(--accent), 0 6px 24px -8px var(--neon);
+
+  --page-bg:
+    radial-gradient(50% 40% at 85% 0%, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 70%),
+    radial-gradient(45% 45% at 0% 100%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    linear-gradient(color-mix(in srgb, var(--accent) 6%, transparent) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 6%, transparent) 1px, transparent 1px) 0 0 / 44px 44px,
+    var(--bg);
+
+  --display-transform: uppercase;
+  --display-spacing: 0.06em;
+  --display-weight: 900;
+  --display-shadow: 0 0 22px var(--neon);
+}
+
+html:root[data-family="cyber"][data-mode="light"] {
+  --neon: color-mix(in srgb, var(--accent) 35%, transparent);
+  --display-shadow: 2px 2px 0 color-mix(in srgb, var(--accent-2) 45%, transparent);
+}
+
+html:root[data-family="cyber"] .tk-fx {
+  display: block;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+html:root[data-family="cyber"] .tk-fx::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--accent) 7%, transparent), transparent);
+  animation: tk-scan 7s linear infinite;
+}
+
+html:root[data-family="cyber"][data-mode="light"] .tk-fx { opacity: 0.35; }
+
+@keyframes tk-scan {
+  from { top: -120px; }
+  to   { top: 100%; }
+}
+
+@keyframes tk-glitch {
+  0%, 100% { text-shadow: var(--display-shadow); transform: none; }
+  20% { text-shadow: -3px 0 var(--accent-2), 3px 0 var(--accent); transform: translate(1px, -1px); }
+  40% { text-shadow: 3px 0 var(--accent-2), -3px 0 var(--accent); transform: translate(-1px, 1px); clip-path: inset(10% 0 35% 0); }
+  60% { text-shadow: -2px 0 var(--accent-2), 2px 0 var(--accent); transform: none; clip-path: inset(55% 0 5% 0); }
+  80% { text-shadow: 2px 0 var(--accent-2), -2px 0 var(--accent); clip-path: none; }
+}
+
+html:root[data-family="cyber"] .tk-display:hover { animation: tk-glitch 0.45s steps(2) 1; }
+
+html:root[data-family="cyber"] .tk-brand {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 12px var(--neon);
+}
+
+html:root[data-family="cyber"] .tk-menu {
+  border: 0;
+  border-radius: 0;
+  background: color-mix(in oklab, var(--bg), var(--fg) 5%);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+html:root[data-family="cyber"] :is(.tk-fam, .tk-pal) { border-radius: 0; }
+html:root[data-family="cyber"] .tk-fam[aria-pressed="true"] { box-shadow: 0 0 14px -2px var(--neon); }
+html:root[data-family="cyber"] .tk-menu-head { font-family: var(--font-display); letter-spacing: 0.14em; color: var(--accent); }
+html:root[data-family="cyber"] .tk-controls .tk-btn { text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ==========================================================================
+   FAMILY: Slots Arcade — cabinet panels, gold bevels, chasing marquee bulbs
+   ========================================================================== */
+html:root[data-family="arcade"] {
+  --font-body: Rubik, "Segoe UI", system-ui, sans-serif;
+  --font-display: Bungee, Impact, "Arial Black", sans-serif;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --elev-lift: 7%;
+  --line: color-mix(in oklab, var(--bg), var(--accent) 30%);
+  --gold: linear-gradient(135deg, color-mix(in oklab, var(--accent), #fff 45%), var(--accent) 35%, color-mix(in oklab, var(--accent), #000 30%) 60%, var(--accent) 80%, color-mix(in oklab, var(--accent), #fff 35%));
+  --glow: color-mix(in srgb, var(--accent) 45%, transparent);
+  --accent-strong: var(--accent);
+
+  --surface-bg:
+    linear-gradient(180deg, color-mix(in oklab, var(--bg-elev), #fff 5%), color-mix(in oklab, var(--bg-elev), #000 12%)) padding-box,
+    var(--gold) border-box;
+  --surface-border: transparent;
+  --surface-border-w: 2px;
+  --surface-shadow: 0 10px 30px -12px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --tile-hover-bg:
+    linear-gradient(180deg, color-mix(in oklab, var(--bg-elev), #fff 10%), color-mix(in oklab, var(--bg-elev), #000 6%)) padding-box,
+    var(--gold) border-box;
+  --tile-hover-border: transparent;
+  --tile-hover-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent), 0 18px 40px -12px var(--glow);
+  --tile-hover-transform: translateY(-5px) scale(1.025);
+  --tile-active-transform: translateY(1px) scale(0.98);
+
+  --btn-bg: linear-gradient(180deg, color-mix(in oklab, var(--accent), #fff 38%) 0%, var(--accent) 48%, color-mix(in oklab, var(--accent), #000 18%) 100%);
+  --btn-fg: var(--accent-fg);
+  --btn-border: color-mix(in oklab, var(--accent), #000 35%);
+  --btn-shadow: 0 3px 0 color-mix(in oklab, var(--accent), #000 45%), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --btn-hover-bg: var(--btn-bg);
+  --btn-hover-fg: var(--accent-fg);
+  --btn-hover-border: var(--btn-border);
+  --btn-hover-shadow: 0 3px 0 color-mix(in oklab, var(--accent), #000 45%), 0 0 16px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  /* pressed like a real spin button: it sinks into its shadow */
+  --btn-active-transform: translateY(3px);
+
+  --header-bg: linear-gradient(180deg, color-mix(in oklab, var(--bg), #000 35%), color-mix(in oklab, var(--bg), #000 10%));
+  --header-fg: var(--fg);
+  --header-border: transparent;
+  --header-blur: none;
+  --header-shadow: 0 8px 26px -10px var(--glow);
+
+  --page-bg:
+    radial-gradient(60% 45% at 50% -8%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%),
+    radial-gradient(40% 40% at 0% 100%, color-mix(in srgb, var(--accent-2) 20%, transparent), transparent 70%),
+    radial-gradient(40% 40% at 100% 100%, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 70%),
+    radial-gradient(circle, color-mix(in srgb, var(--accent) 9%, transparent) 1.2px, transparent 1.6px) 0 0 / 22px 22px,
+    var(--bg);
+
+  --display-weight: 400;
+  --display-spacing: 0.02em;
+}
+
+html:root[data-family="arcade"][data-mode="light"] {
+  --elev-lift: 80%;
+  --header-bg: linear-gradient(180deg, color-mix(in oklab, var(--accent), #000 30%), color-mix(in oklab, var(--accent), #000 10%));
+  --header-fg: #fff8e8;
+  --surface-bg:
+    linear-gradient(180deg, #ffffff, color-mix(in oklab, var(--bg), var(--accent) 7%)) padding-box,
+    var(--gold) border-box;
+  --tile-hover-bg:
+    linear-gradient(180deg, #ffffff, color-mix(in oklab, var(--bg), var(--accent) 12%)) padding-box,
+    var(--gold) border-box;
+}
+
+html:root[data-family="arcade"] .tk-btn:active { box-shadow: 0 0 0 color-mix(in oklab, var(--accent), #000 45%), inset 0 2px 4px rgba(0, 0, 0, 0.35); }
+
+/* the header's bottom edge is a row of chasing marquee bulbs */
+html:root[data-family="arcade"] .tk-header { position: relative; }
+
+html:root[data-family="arcade"] .tk-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 10px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, #fff8d6 0 2px, color-mix(in srgb, var(--accent) 90%, transparent) 2.6px, transparent 4px) 0 0 / 18px 10px repeat-x,
+    radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent) 0 2.4px, transparent 3px) 9px 0 / 18px 10px repeat-x;
+  filter: drop-shadow(0 0 4px var(--accent));
+  animation: tk-chase 0.9s steps(1) infinite;
+}
+
+@keyframes tk-chase {
+  0%   { background-position: 0 0, 9px 0; }
+  50%  { background-position: 9px 0, 0 0; }
+}
+
+/* gold-leaf headings */
+html:root[data-family="arcade"] .tk-display {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent), #fff 55%) 0%, var(--accent) 50%, color-mix(in oklab, var(--accent), #000 28%) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 0 color-mix(in oklab, var(--accent), #000 55%)) drop-shadow(0 0 14px var(--glow));
+}
+
+html:root[data-family="arcade"] .tk-brand { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.02em; }
+
+/* a light sweep across a tile as you hover, like a reel win */
+html:root[data-family="arcade"] .tk-tile { position: relative; overflow: hidden; }
+
+html:root[data-family="arcade"] .tk-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 48%, transparent 66%);
+  transform: translateX(-120%);
+}
+
+html:root[data-family="arcade"] .tk-tile:hover::before {
+  transform: translateX(120%);
+  transition: transform 0.7s var(--ease-out);
+}
+
+html:root[data-family="arcade"] .tk-menu {
+  border: 2px solid transparent;
+  border-radius: 18px;
+  background:
+    linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+    var(--gold) border-box;
+  box-shadow: 0 20px 50px -16px var(--glow);
+}
+
+html:root[data-family="arcade"] .tk-menu-head { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.06em; color: var(--accent); }
+
+/* twinkling cabinet sparkle */
+html:root[data-family="arcade"][data-mode="dark"] .tk-fx {
+  display: block;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 22%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 78% 14%, #fff, transparent),
+    radial-gradient(1px 1px at 42% 68%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 88% 76%, #fff, transparent),
+    radial-gradient(1px 1px at 24% 88%, #fff, transparent);
+  opacity: 0.5;
+  animation: tk-twinkle 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes tk-twinkle {
+  from { opacity: 0.15; }
+  to   { opacity: 0.6; }
+}
+
+/* ---- motion preferences ---- */
+@media (prefers-reduced-motion: reduce) {
+  .tk-rise, .tk-page-enter, .tk-fam, .tk-pal, .tk-menu, .tk-fx, .tk-fx::after,
+  html:root[data-family="arcade"] .tk-header::after { animation: none !important; }
+}
+
+@media (max-width: 560px) {
+  .tk-controls .tk-label { display: none; }
+  /* pin the picker to the screen edges so it can never run off a phone */
+  .tk-menu {
+    position: fixed;
+    top: 64px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: calc(100dvh - 84px);
+    transform-origin: top center;
+  }
+  .tk-fam-grid, .tk-pal-grid { grid-template-columns: repeat(2, 1fr); }
+  /* XP / Factorio windows go edge to edge on a phone */
+  html:root:is([data-family="xp"], [data-family="factorio"]) .tk-window { margin-left: 6px; margin-right: 6px; }
+}
